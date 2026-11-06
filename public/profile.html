@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your profile information and update your account password on Sainath Bus Reservation.">
+  <title>User Profile & Security - Sainath Bus Reservation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="buses.html" class="nav-link">Search Buses</a></li>
+          <li><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-auth-buttons" id="navbar-auth"></div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 40px 24px 80px; max-width: 900px;">
+
+    <div style="margin-bottom: 28px;">
+      <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 700; color: var(--primary-navy);">
+        My Account & Security
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 0.95rem;">
+        Manage your contact details and update your login password.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
+
+      <!-- Profile Details Card -->
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+          <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--secondary-navy); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+            👤
+          </div>
+          <div>
+            <h3 id="display-name" style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--primary-navy);">-</h3>
+            <span id="display-email" style="font-size: 0.85rem; color: var(--text-muted);">-</span>
+          </div>
+        </div>
+
+        <div id="profile-alert" class="alert alert-success" style="display: none;"></div>
+
+        <form id="profile-update-form">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="prof-name">Full Name</label>
+            <input type="text" id="prof-name" class="form-control" required style="padding-left: 14px;">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="prof-email">Email Address (Registered)</label>
+            <input type="email" id="prof-email" class="form-control" disabled style="padding-left: 14px; background: #f1f5f9; cursor: not-allowed;">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Email is linked to your account and cannot be modified.</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 22px;">
+            <label class="form-label" for="prof-phone">Phone Number</label>
+            <input type="tel" id="prof-phone" class="form-control" required pattern="[0-9]{10}" maxlength="10" style="padding-left: 14px;">
+          </div>
+
+          <button type="submit" class="btn btn-navy btn-block" id="btn-update-profile">
+            Save Profile Changes
+          </button>
+        </form>
+      </div>
+
+      <!-- Change Password Card -->
+      <div class="card">
+        <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--primary-navy);">
+            Change Password
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">
+            Update your account password. Must be at least 6 characters.
+          </p>
+        </div>
+
+        <!-- Alert messages for Password Form -->
+        <div id="pwd-alert-error" class="alert alert-danger" style="display: none;"></div>
+        <div id="pwd-alert-success" class="alert alert-success" style="display: none;"></div>
+
+        <form id="change-password-form">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="pwd-current">Current Password *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="pwd-current" class="form-control" placeholder="Enter current password" required autocomplete="current-password">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="pwd-new">New Password (min 6 characters) *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔑</span>
+              <input type="password" id="pwd-new" class="form-control" placeholder="Enter new password" required minlength="6" autocomplete="new-password">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 22px;">
+            <label class="form-label" for="pwd-confirm">Confirm New Password *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔑</span>
+              <input type="password" id="pwd-confirm" class="form-control" placeholder="Repeat new password" required minlength="6" autocomplete="new-password">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="btn-change-pwd">
+            Update Password
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      &copy; 2026 Sainath Bus Reservation System. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    async function loadProfile() {
+      try {
+        const auth = await api.auth.me();
+        if (!auth.authenticated) {
+          window.location.href = 'login.html?redirect=profile.html';
+          return;
+        }
+
+        const data = await api.user.getProfile();
+        const profile = data.profile;
+
+        document.getElementById('display-name').textContent = profile.name;
+        document.getElementById('display-email').textContent = profile.email;
+
+        document.getElementById('prof-name').value = profile.name;
+        document.getElementById('prof-email').value = profile.email;
+        document.getElementById('prof-phone').value = profile.phone;
+      } catch (err) {
+        showToast('Error loading profile: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProfile();
+
+      // Update Profile Information
+      const profileForm = document.getElementById('profile-update-form');
+      const profileAlert = document.getElementById('profile-alert');
+      profileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        profileAlert.style.display = 'none';
+
+        const name = document.getElementById('prof-name').value.trim();
+        const phone = document.getElementById('prof-phone').value.trim();
+
+        try {
+          const res = await api.user.updateProfile(name, phone);
+          profileAlert.textContent = res.message || 'Profile updated successfully!';
+          profileAlert.style.display = 'flex';
+          document.getElementById('display-name').textContent = name;
+          showToast('Profile updated!', 'success');
+        } catch (err) {
+          showToast(err.message || 'Failed to update profile', 'error');
+        }
+      });
+
+      // Change Password
+      const pwdForm = document.getElementById('change-password-form');
+      const pwdErr = document.getElementById('pwd-alert-error');
+      const pwdSucc = document.getElementById('pwd-alert-success');
+      const pwdBtn = document.getElementById('btn-change-pwd');
+
+      pwdForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        pwdErr.style.display = 'none';
+        pwdSucc.style.display = 'none';
+
+        const currentPassword = document.getElementById('pwd-current').value;
+        const newPassword = document.getElementById('pwd-new').value;
+        const confirmPassword = document.getElementById('pwd-confirm').value;
+
+        if (newPassword.length < 6) {
+          pwdErr.textContent = 'New password must be at least 6 characters long.';
+          pwdErr.style.display = 'flex';
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          pwdErr.textContent = 'New password and confirmation do not match.';
+          pwdErr.style.display = 'flex';
+          return;
+        }
+
+        pwdBtn.disabled = true;
+        pwdBtn.textContent = 'Updating password...';
+
+        try {
+          const res = await api.user.changePassword(currentPassword, newPassword, confirmPassword);
+          pwdBtn.disabled = false;
+          pwdBtn.textContent = 'Update Password';
+          pwdSucc.textContent = res.message || 'Password changed successfully!';
+          pwdSucc.style.display = 'flex';
+          pwdForm.reset();
+          showToast('Password updated successfully!', 'success');
+        } catch (err) {
+          pwdBtn.disabled = false;
+          pwdBtn.textContent = 'Update Password';
+          pwdErr.textContent = err.message || 'Failed to change password.';
+          pwdErr.style.display = 'flex';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

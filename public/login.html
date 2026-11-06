@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login to your Sainath Bus Reservation account to manage bookings and reserve seats.">
+  <title>Login - Sainath Bus Reservation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="buses.html" class="nav-link">Search Buses</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-auth-buttons" id="navbar-auth"></div>
+    </div>
+  </header>
+
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Login to your Sainath Bus Reservation account</p>
+      </div>
+
+      <!-- Alert Notification -->
+      <div id="login-alert" class="alert alert-danger" style="display: none;"></div>
+
+      <form id="login-form">
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label class="form-label" for="login-email">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="login-email" class="form-control" placeholder="name@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label class="form-label" for="login-password">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="login-password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" id="btn-toggle-pwd" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; color: var(--text-muted);">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-login-submit">
+          Sign In
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account yet? 
+        <a href="register.html" id="link-register">Register here</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      &copy; 2026 Sainath Bus Reservation System. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTarget = urlParams.get('redirect') || 'index.html';
+
+      // Pass redirect param to register link as well
+      if (urlParams.get('redirect')) {
+        document.getElementById('link-register').href = `register.html?redirect=${encodeURIComponent(redirectTarget)}`;
+      }
+
+      // Password toggle
+      const pwdInput = document.getElementById('login-password');
+      document.getElementById('btn-toggle-pwd').addEventListener('click', () => {
+        if (pwdInput.type === 'password') {
+          pwdInput.type = 'text';
+        } else {
+          pwdInput.type = 'password';
+        }
+      });
+
+      // Login form submit
+      const form = document.getElementById('login-form');
+      const alertBox = document.getElementById('login-alert');
+      const submitBtn = document.getElementById('btn-login-submit');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.style.display = 'none';
+
+        const email = document.getElementById('login-email').value.trim();
+        const password = pwdInput.value;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in...';
+
+        try {
+          const res = await api.auth.login(email, password);
+          showToast(res.message || 'Login successful!', 'success');
+          setTimeout(() => {
+            window.location.href = res.user?.role === 'ADMIN' ? 'admin.html' : redirectTarget;
+          }, 800);
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign In';
+          alertBox.textContent = err.message || 'Invalid email or password';
+          alertBox.style.display = 'flex';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

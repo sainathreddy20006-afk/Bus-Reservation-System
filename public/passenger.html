@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Enter passenger details for your Sainath Bus Reservation booking.">
+  <title>Passenger Details - Sainath Bus Reservation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="buses.html" class="nav-link">Search Buses</a></li>
+          <li><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-auth-buttons" id="navbar-auth"></div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 40px 24px 80px; max-width: 900px;">
+
+    <!-- Navigation Breadcrumb -->
+    <div style="margin-bottom: 24px;">
+      <a href="seats.html" id="link-back-seats" style="color: var(--accent-orange); font-weight: 600; font-size: 0.9rem;">
+        ← Back to Seat Selection
+      </a>
+    </div>
+
+    <!-- Booking Progress Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 18px 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+      <div style="display: flex; align-items: center; gap: 8px; color: var(--status-success); font-weight: 600; font-size: 0.9rem;">
+        <span>✓</span> 1. Select Seats
+      </div>
+      <div style="width: 40px; height: 2px; background: var(--accent-orange);"></div>
+      <div style="display: flex; align-items: center; gap: 8px; color: var(--accent-orange); font-weight: 700; font-size: 0.9rem;">
+        <span>②</span> 2. Passenger Details
+      </div>
+      <div style="width: 40px; height: 2px; background: var(--border-color);"></div>
+      <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.9rem;">
+        <span>③</span> 3. Confirmation & Payment
+      </div>
+    </div>
+
+    <!-- Journey Mini-Summary -->
+    <div class="card" style="margin-bottom: 28px; background: linear-gradient(135deg, var(--primary-navy), var(--secondary-navy)); color: white;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #ff9d5c; font-weight: 700;">YOUR JOURNEY</span>
+          <h2 id="mini-route" style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; margin: 4px 0;">...</h2>
+          <p id="mini-meta" style="color: #cbd5e1; font-size: 0.88rem;">...</p>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 0.8rem; color: #94a3b8;">SEATS SELECTED</div>
+          <div id="mini-seats-chips" style="margin-top: 4px; display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Passenger Form -->
+    <form id="passenger-details-form">
+      
+      <!-- Container for dynamic passenger rows -->
+      <div id="passengers-inputs-container" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px;">
+        <!-- Injected dynamically for each seat -->
+      </div>
+
+      <!-- Primary Contact Card -->
+      <div class="card" style="margin-bottom: 30px;">
+        <h3 style="font-family: var(--font-heading); font-size: 1.2rem; color: var(--primary-navy); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+          Primary Contact Details
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+          Your booking confirmation and e-ticket will be sent to this email address and phone number.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="contact-email">Email Address *</label>
+            <input type="email" id="contact-email" class="form-control" placeholder="e.g. name@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="contact-phone">Mobile Phone (10 digits) *</label>
+            <input type="tel" id="contact-phone" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="seats.html" class="btn btn-secondary">← Change Seats</a>
+        <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-passengers">
+          Proceed to Summary & Pay ➔
+        </button>
+      </div>
+
+    </form>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      &copy; 2026 Sainath Bus Reservation System. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    let draft = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const stored = sessionStorage.getItem('sainath_booking_draft');
+      if (!stored) {
+        showToast('No seat selection found. Redirecting to bus search...', 'error');
+        setTimeout(() => window.location.href = 'buses.html', 1500);
+        return;
+      }
+
+      draft = JSON.parse(stored);
+      if (!draft.bus || !draft.seats || draft.seats.length === 0) {
+        showToast('Invalid booking state.', 'error');
+        setTimeout(() => window.location.href = 'buses.html', 1500);
+        return;
+      }
+
+      // Update link back to seats with bus_id
+      document.getElementById('link-back-seats').href = `seats.html?bus_id=${draft.bus.bus_id}`;
+
+      // Render Mini-Summary
+      document.getElementById('mini-route').textContent = `${draft.bus.source} ➔ ${draft.bus.destination}`;
+      document.getElementById('mini-meta').textContent = `${draft.bus.bus_name} (${draft.bus.bus_no}) • ${formatDate(draft.bus.travel_date)} at ${formatTime(draft.bus.departure_time)}`;
+      
+      const chipsEl = document.getElementById('mini-seats-chips');
+      chipsEl.innerHTML = draft.seats.map(s => `
+        <span class="seat-chip" style="background: white; color: var(--primary-navy); border-color: rgba(255,255,255,0.4);">Seat ${s}</span>
+      `).join('');
+
+      // Check if user is logged in to prefill contact details
+      try {
+        const authRes = await api.auth.me();
+        if (authRes.authenticated && authRes.user) {
+          document.getElementById('contact-email').value = authRes.user.email || '';
+          document.getElementById('contact-phone').value = authRes.user.phone || '';
+        }
+      } catch (e) {
+        console.warn('Could not check user for prefill', e);
+      }
+
+      // Render Passenger Card for each selected seat
+      const container = document.getElementById('passengers-inputs-container');
+      container.innerHTML = draft.seats.map((seatNo, idx) => `
+        <div class="card" id="passenger-card-${seatNo}">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--primary-navy); display: flex; align-items: center; gap: 8px;">
+              <span class="seat-chip">Seat ${seatNo}</span>
+              <span>Passenger ${idx + 1}</span>
+            </div>
+            <span style="font-size: 0.85rem; color: var(--accent-orange); font-weight: 700;">${formatINR(draft.bus.fare)}</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="p-name-${seatNo}">Full Name *</label>
+              <input type="text" id="p-name-${seatNo}" class="form-control" placeholder="Enter passenger name" required minlength="2">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="p-age-${seatNo}">Age (Years) *</label>
+              <input type="number" id="p-age-${seatNo}" class="form-control" placeholder="e.g. 28" min="3" max="110" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="p-gender-${seatNo}">Gender *</label>
+              <select id="p-gender-${seatNo}" class="form-control" required style="padding-left: 14px;">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Form submit handler
+      document.getElementById('passenger-details-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const contactEmail = document.getElementById('contact-email').value.trim();
+        const contactPhone = document.getElementById('contact-phone').value.trim();
+
+        if (!contactEmail || !contactPhone) {
+          showToast('Please provide primary contact email and phone number', 'error');
+          return;
+        }
+
+        const passengersList = [];
+        for (const seatNo of draft.seats) {
+          const nameInput = document.getElementById(`p-name-${seatNo}`);
+          const ageInput = document.getElementById(`p-age-${seatNo}`);
+          const genderInput = document.getElementById(`p-gender-${seatNo}`);
+
+          const name = nameInput.value.trim();
+          const age = parseInt(ageInput.value, 10);
+          const gender = genderInput.value;
+
+          if (!name || isNaN(age)) {
+            showToast(`Please complete all fields for Seat ${seatNo}`, 'error');
+            return;
+          }
+
+          passengersList.push({
+            seat_no: seatNo,
+            name,
+            age,
+            gender
+          });
+        }
+
+        // Save detailed passenger info to draft
+        draft.passengers = passengersList;
+        draft.contact = { email: contactEmail, phone: contactPhone };
+
+        sessionStorage.setItem('sainath_booking_draft', JSON.stringify(draft));
+
+        // Proceed to booking summary & payment
+        window.location.href = 'booking.html';
+      });
+    });
+  </script>
+</body>
+</html>

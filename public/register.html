@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create a new account on Sainath Bus Reservation for fast bookings and travel management.">
+  <title>Register - Sainath Bus Reservation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="buses.html" class="nav-link">Search Buses</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-auth-buttons" id="navbar-auth"></div>
+    </div>
+  </header>
+
+  <main class="auth-page">
+    <div class="auth-card" style="max-width: 520px;">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <line x1="19" y1="8" x2="19" y2="14"></line>
+            <line x1="22" y1="11" x2="16" y2="11"></line>
+          </svg>
+        </div>
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-subtitle">Join Sainath Bus Reservation for fast bookings & exclusive perks</p>
+      </div>
+
+      <!-- Alert Notification -->
+      <div id="register-alert" class="alert alert-danger" style="display: none;"></div>
+
+      <form id="register-form">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" for="reg-name">Full Name *</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input type="text" id="reg-name" class="form-control" placeholder="e.g. Ramesh Patil" required minlength="2" autocomplete="name">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email Address *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="reg-email" class="form-control" placeholder="name@example.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-phone">Phone Number (10 digits) *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📞</span>
+              <input type="tel" id="reg-phone" class="form-control" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required autocomplete="tel">
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px;">
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Password (min 6) *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="reg-password" class="form-control" placeholder="••••••••" required minlength="6" autocomplete="new-password">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-confirm-password">Confirm Password *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="reg-confirm-password" class="form-control" placeholder="••••••••" required minlength="6" autocomplete="new-password">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-reg-submit">
+          Create Account & Continue
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? 
+        <a href="login.html" id="link-login">Sign In here</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      &copy; 2026 Sainath Bus Reservation System. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTarget = urlParams.get('redirect') || 'index.html';
+
+      if (urlParams.get('redirect')) {
+        document.getElementById('link-login').href = `login.html?redirect=${encodeURIComponent(redirectTarget)}`;
+      }
+
+      const form = document.getElementById('register-form');
+      const alertBox = document.getElementById('register-alert');
+      const submitBtn = document.getElementById('btn-reg-submit');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.style.display = 'none';
+
+        const name = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const confirmPassword = document.getElementById('reg-confirm-password').value;
+
+        if (password !== confirmPassword) {
+          alertBox.textContent = 'Passwords do not match.';
+          alertBox.style.display = 'flex';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating account...';
+
+        try {
+          const res = await api.auth.register({
+            name,
+            email,
+            phone,
+            password,
+            confirmPassword
+          });
+
+          showToast('Account created successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = redirectTarget;
+          }, 800);
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Account & Continue';
+          alertBox.textContent = err.message || 'Registration failed. Please try again.';
+          alertBox.style.display = 'flex';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

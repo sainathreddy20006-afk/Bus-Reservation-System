@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Select your preferred seats on Sainath Bus Reservation with interactive seat layout.">
+  <title>Select Seats - Sainath Bus Reservation</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Seat Map Specific Grid Layout */
+    .bus-aisle-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    .seat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .seat-pair {
+      display: flex;
+      gap: 10px;
+    }
+    .aisle-walkway {
+      width: 32px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .seat-box {
+      width: 52px;
+      height: 48px;
+      border: 2px solid var(--navy-light);
+      border-radius: 8px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary-navy);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .seat-box:hover:not(.booked) {
+      border-color: var(--accent-orange);
+      background: var(--accent-orange-light);
+      transform: scale(1.05);
+    }
+    .seat-box.selected {
+      background: var(--accent-orange) !important;
+      border-color: var(--accent-orange-hover) !important;
+      color: white !important;
+      box-shadow: 0 4px 10px rgba(255, 101, 0, 0.4);
+    }
+    .seat-box.booked {
+      background: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
+      color: #94a3b8 !important;
+      cursor: not-allowed !important;
+    }
+    .seat-box.booked::after {
+      content: '✕';
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      font-size: 0.7rem;
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="buses.html" class="nav-link">Search Buses</a></li>
+          <li><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-auth-buttons" id="navbar-auth"></div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 40px 24px 80px;">
+
+    <!-- Top Navigation Path -->
+    <div style="margin-bottom: 24px;">
+      <a href="buses.html" style="color: var(--accent-orange); font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+        ← Back to Buses List
+      </a>
+    </div>
+
+    <!-- Bus Header Info Card -->
+    <div id="bus-header-card" class="card" style="margin-bottom: 30px; border-left: 5px solid var(--accent-orange);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <h1 id="bus-title" style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--primary-navy); margin-bottom: 4px;">
+            Loading Bus Details...
+          </h1>
+          <div style="display: flex; gap: 12px; font-size: 0.9rem; color: var(--text-secondary); flex-wrap: wrap;">
+            <span id="bus-route-text"><strong>Route:</strong> ...</span>
+            <span>•</span>
+            <span id="bus-date-text"><strong>Date:</strong> ...</span>
+            <span>•</span>
+            <span id="bus-time-text"><strong>Departure:</strong> ...</span>
+            <span>•</span>
+            <span id="bus-type-badge" class="bus-type-badge">...</span>
+          </div>
+        </div>
+
+        <div style="text-align: right;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">FARE PER SEAT</div>
+          <div id="bus-fare-display" style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--accent-orange);">
+            ₹0
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seat Booking Grid & Sidebar -->
+    <div class="seat-booking-layout">
+
+      <!-- Interactive Bus Coach Layout -->
+      <div class="bus-coach-container">
+        <div class="bus-coach-header">
+          <div>
+            <h2 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--primary-navy);">
+              Select Your Seats
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Click on any available seat to select or unselect (up to 6 seats)</p>
+          </div>
+          <div id="seats-count-badge" class="seats-badge available">
+            ...
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="seat-legend">
+          <div class="legend-item">
+            <div class="legend-box available"></div>
+            <span>Available</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-box selected"></div>
+            <span>Selected</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-box booked"></div>
+            <span>Booked / Reserved</span>
+          </div>
+        </div>
+
+        <!-- Driver Steering Wheel Indicator -->
+        <div class="driver-cabin">
+          <span>FRONT OF BUS (CABIN)</span>
+          <span style="font-size: 1.3rem;">🛞</span>
+        </div>
+
+        <!-- Dynamic Seat Rows Container -->
+        <div id="seat-rows-container" class="bus-aisle-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+          REAR OF BUS • EMERGENCY EXIT
+        </div>
+      </div>
+
+      <!-- Booking Summary Sidebar -->
+      <aside class="booking-summary-sidebar">
+        <h3 class="sidebar-title">Booking Summary</h3>
+
+        <div class="summary-row">
+          <span style="color: var(--text-secondary);">Bus No.</span>
+          <span id="summary-bus-no" style="font-weight: 600;">-</span>
+        </div>
+
+        <div class="summary-row">
+          <span style="color: var(--text-secondary);">Travel Date</span>
+          <span id="summary-travel-date" style="font-weight: 600;">-</span>
+        </div>
+
+        <div class="summary-row">
+          <span style="color: var(--text-secondary);">Selected Seats</span>
+          <span id="summary-seats-count" style="font-weight: 700; color: var(--accent-orange);">0 Seats</span>
+        </div>
+
+        <!-- Selected Seat Numbers Chips -->
+        <div id="selected-seats-list" class="selected-seats-chips">
+          <span style="color: var(--text-muted); font-size: 0.85rem;">No seats selected yet</span>
+        </div>
+
+        <div style="margin: 16px 0; border-top: 1px solid var(--border-color);"></div>
+
+        <div class="summary-row">
+          <span style="color: var(--text-secondary);">Base Fare</span>
+          <span id="summary-base-fare">₹0</span>
+        </div>
+
+        <div class="summary-row">
+          <span style="color: var(--text-secondary);">GST & Toll Tax (5%)</span>
+          <span id="summary-tax-amount">₹0</span>
+        </div>
+
+        <div class="summary-row total">
+          <span>Total Amount</span>
+          <span id="summary-total-fare" class="total-amount">₹0</span>
+        </div>
+
+        <button id="btn-proceed-passenger" class="btn btn-primary btn-block btn-lg" style="margin-top: 24px;" disabled>
+          Proceed to Passenger Details ➔
+        </button>
+
+        <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 12px;">
+          🔒 Secure 256-bit SSL encrypted reservation
+        </p>
+      </aside>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      &copy; 2026 Sainath Bus Reservation System. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    let currentBus = null;
+    let selectedSeats = new Set();
+    const MAX_SEATS = 6;
+
+    function getBusId() {
+      const p = new URLSearchParams(window.location.search);
+      return p.get('bus_id');
+    }
+
+    async function loadSeats() {
+      const busId = getBusId();
+      if (!busId) {
+        showToast('No bus selected. Redirecting to search...', 'error');
+        setTimeout(() => window.location.href = 'buses.html', 1500);
+        return;
+      }
+
+      try {
+        const data = await api.buses.getSeats(busId);
+        currentBus = data.bus;
+
+        // Render bus header
+        document.getElementById('bus-title').textContent = currentBus.bus_name;
+        document.getElementById('bus-route-text').innerHTML = `<strong>Route:</strong> ${escapeHtml(currentBus.source)} ➔ ${escapeHtml(currentBus.destination)}`;
+        document.getElementById('bus-date-text').innerHTML = `<strong>Date:</strong> ${formatDate(currentBus.travel_date)}`;
+        document.getElementById('bus-time-text').innerHTML = `<strong>Departure:</strong> ${formatTime(currentBus.departure_time)}`;
+        document.getElementById('bus-type-badge').textContent = currentBus.bus_type;
+        document.getElementById('bus-fare-display').textContent = formatINR(currentBus.fare);
+        document.getElementById('seats-count-badge').innerHTML = `<span>💺</span> ${data.available_count} Available`;
+
+        // Summary sidebar init
+        document.getElementById('summary-bus-no').textContent = currentBus.bus_no;
+        document.getElementById('summary-travel-date').textContent = formatDate(currentBus.travel_date);
+
+        // Render 40 seats in rows of 4 with aisle
+        renderSeatGrid(data.seats);
+      } catch (err) {
+        showToast('Error loading seat configuration: ' + err.message, 'error');
+      }
+    }
+
+    function renderSeatGrid(seatsList) {
+      const container = document.getElementById('seat-rows-container');
+      container.innerHTML = '';
+
+      // Group seats into rows of 4 (left pair: seats 1 & 2; right pair: seats 3 & 4)
+      const totalRows = Math.ceil(seatsList.length / 4);
+
+      for (let r = 1; r <= totalRows; r++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'seat-row';
+
+        const s1 = seatsList[(r - 1) * 4];
+        const s2 = seatsList[(r - 1) * 4 + 1];
+        const s3 = seatsList[(r - 1) * 4 + 2];
+        const s4 = seatsList[(r - 1) * 4 + 3];
+
+        // Left Pair
+        const leftPair = document.createElement('div');
+        leftPair.className = 'seat-pair';
+        if (s1) leftPair.appendChild(createSeatElement(s1));
+        if (s2) leftPair.appendChild(createSeatElement(s2));
+
+        // Aisle Spacer
+        const aisle = document.createElement('div');
+        aisle.className = 'aisle-walkway';
+        aisle.textContent = `R${r}`;
+
+        // Right Pair
+        const rightPair = document.createElement('div');
+        rightPair.className = 'seat-pair';
+        if (s3) rightPair.appendChild(createSeatElement(s3));
+        if (s4) rightPair.appendChild(createSeatElement(s4));
+
+        rowDiv.appendChild(leftPair);
+        rowDiv.appendChild(aisle);
+        rowDiv.appendChild(rightPair);
+
+        container.appendChild(rowDiv);
+      }
+    }
+
+    function createSeatElement(seat) {
+      const el = document.createElement('div');
+      el.className = `seat-box ${seat.is_booked ? 'booked' : ''}`;
+      el.id = `seat-btn-${seat.seat_no}`;
+      el.dataset.seatNo = seat.seat_no;
+
+      el.innerHTML = `
+        <span style="font-size: 0.95rem;">${seat.seat_no}</span>
+        <span style="font-size: 0.65rem; color: ${seat.is_booked ? '#94a3b8' : 'var(--text-muted)'};">${seat.is_window ? 'W' : 'A'}</span>
+      `;
+
+      if (!seat.is_booked) {
+        el.addEventListener('click', () => toggleSeat(seat.seat_no));
+      } else {
+        el.addEventListener('click', () => {
+          showToast(`Seat ${seat.seat_no} is already booked`, 'error');
+        });
+      }
+
+      return el;
+    }
+
+    function toggleSeat(seatNo) {
+      if (selectedSeats.has(seatNo)) {
+        selectedSeats.delete(seatNo);
+      } else {
+        if (selectedSeats.size >= MAX_SEATS) {
+          showToast(`Maximum ${MAX_SEATS} seats allowed per booking.`, 'error');
+          return;
+        }
+        selectedSeats.add(seatNo);
+      }
+
+      // Update UI classes
+      const seatEl = document.getElementById(`seat-btn-${seatNo}`);
+      if (seatEl) {
+        if (selectedSeats.has(seatNo)) {
+          seatEl.classList.add('selected');
+        } else {
+          seatEl.classList.remove('selected');
+        }
+      }
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const count = selectedSeats.size;
+      const seatsArr = Array.from(selectedSeats).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+
+      document.getElementById('summary-seats-count').textContent = `${count} Seat${count === 1 ? '' : 's'}`;
+
+      const chipsContainer = document.getElementById('selected-seats-list');
+      if (count === 0) {
+        chipsContainer.innerHTML = `<span style="color: var(--text-muted); font-size: 0.85rem;">No seats selected yet</span>`;
+      } else {
+        chipsContainer.innerHTML = seatsArr.map(s => `
+          <span class="seat-chip">Seat ${s}</span>
+        `).join('');
+      }
+
+      const farePerSeat = currentBus ? parseFloat(currentBus.fare) : 0;
+      const baseFare = farePerSeat * count;
+      const taxAmount = Math.round(baseFare * 0.05); // 5% GST
+      const totalFare = baseFare + taxAmount;
+
+      document.getElementById('summary-base-fare').textContent = formatINR(baseFare);
+      document.getElementById('summary-tax-amount').textContent = formatINR(taxAmount);
+      document.getElementById('summary-total-fare').textContent = formatINR(totalFare);
+
+      const proceedBtn = document.getElementById('btn-proceed-passenger');
+      proceedBtn.disabled = count === 0;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSeats();
+
+      document.getElementById('btn-proceed-passenger').addEventListener('click', () => {
+        if (selectedSeats.size === 0) {
+          showToast('Please select at least one seat to proceed', 'error');
+          return;
+        }
+
+        const seatsArr = Array.from(selectedSeats).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+        const bookingDraft = {
+          bus: currentBus,
+          seats: seatsArr,
+          baseFare: currentBus.fare * seatsArr.length,
+          tax: Math.round(currentBus.fare * seatsArr.length * 0.05),
+          totalFare: currentBus.fare * seatsArr.length + Math.round(currentBus.fare * seatsArr.length * 0.05)
+        };
+
+        // Save booking draft into sessionStorage
+        sessionStorage.setItem('sainath_booking_draft', JSON.stringify(bookingDraft));
+
+        // Proceed to passenger details form
+        window.location.href = 'passenger.html';
+      });
+    });
+  </script>
+</body>
+</html>

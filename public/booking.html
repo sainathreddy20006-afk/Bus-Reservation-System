@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Review journey details and confirm your bus ticket reservation on Sainath Bus Reservation.">
+  <title>Booking Summary & Payment - Sainath Bus Reservation</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .payment-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+    .payment-tab-btn {
+      padding: 10px 18px;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .payment-tab-btn.active {
+      background: var(--accent-orange-light);
+      border-color: var(--accent-orange);
+      color: var(--accent-orange);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="buses.html" class="nav-link">Search Buses</a></li>
+          <li><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-auth-buttons" id="navbar-auth"></div>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 40px 24px 80px; max-width: 960px;">
+
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 24px;">
+      <a href="passenger.html" style="color: var(--accent-orange); font-weight: 600; font-size: 0.9rem;">
+        ← Back to Passenger Details
+      </a>
+    </div>
+
+    <!-- Booking Progress Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 18px 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+      <div style="display: flex; align-items: center; gap: 8px; color: var(--status-success); font-weight: 600; font-size: 0.9rem;">
+        <span>✓</span> 1. Select Seats
+      </div>
+      <div style="width: 40px; height: 2px; background: var(--status-success);"></div>
+      <div style="display: flex; align-items: center; gap: 8px; color: var(--status-success); font-weight: 600; font-size: 0.9rem;">
+        <span>✓</span> 2. Passenger Details
+      </div>
+      <div style="width: 40px; height: 2px; background: var(--accent-orange);"></div>
+      <div style="display: flex; align-items: center; gap: 8px; color: var(--accent-orange); font-weight: 700; font-size: 0.9rem;">
+        <span>③</span> 3. Confirmation & Payment
+      </div>
+    </div>
+
+    <!-- Auth Warning Box if not logged in -->
+    <div id="auth-required-box" class="card" style="display: none; margin-bottom: 24px; background: #fffbeb; border-color: #fde68a;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.8rem;">🔐</span>
+          <div>
+            <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: #92400e;">Account Login Required</h4>
+            <p style="font-size: 0.88rem; color: #b45309;">Please log in or register to secure your seat booking and generate your official ticket.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="login.html?redirect=booking.html" class="btn btn-outline btn-navy btn-sm">Login</a>
+          <a href="register.html?redirect=booking.html" class="btn btn-primary btn-sm">Register</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 28px;">
+
+      <!-- Left Column: Details -->
+      <div>
+        
+        <!-- Journey Details Card -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; margin-bottom: 16px;">
+            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--primary-navy);">
+              Journey Overview
+            </h3>
+            <span class="bus-type-badge" id="summary-bus-type">...</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">BUS SERVICE</div>
+              <div id="summary-bus-name" style="font-size: 1.1rem; font-weight: 700; color: var(--primary-navy);">-</div>
+              <div id="summary-bus-number" style="font-size: 0.85rem; color: var(--text-secondary);">-</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">DATE OF JOURNEY</div>
+              <div id="summary-journey-date" style="font-size: 1.05rem; font-weight: 700; color: var(--accent-orange);">-</div>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div id="summary-dep-time" style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">-</div>
+              <div id="summary-src-city" style="font-size: 0.95rem; font-weight: 600; color: var(--text-secondary);">-</div>
+            </div>
+            <div style="text-align: center;">
+              <span id="summary-duration" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">-</span>
+              <div style="font-size: 1.2rem; color: var(--accent-orange);">➔</div>
+            </div>
+            <div style="text-align: right;">
+              <div id="summary-arr-time" style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">-</div>
+              <div id="summary-dst-city" style="font-size: 0.95rem; font-weight: 600; color: var(--text-secondary);">-</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passengers List Table -->
+        <div class="card" style="margin-bottom: 24px;">
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--primary-navy); margin-bottom: 16px;">
+            Passengers & Seat Allocation
+          </h3>
+          <div style="overflow-x: auto;">
+            <table class="passenger-table">
+              <thead>
+                <tr>
+                  <th>Seat No.</th>
+                  <th>Passenger Name</th>
+                  <th>Age</th>
+                  <th>Gender</th>
+                  <th style="text-align: right;">Fare</th>
+                </tr>
+              </thead>
+              <tbody id="passengers-table-body">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Simulated Payment Options -->
+        <div class="card" id="payment-section">
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--primary-navy); margin-bottom: 16px;">
+            Select Payment Method
+          </h3>
+
+          <div class="payment-tabs">
+            <button type="button" class="payment-tab-btn active" data-tab="upi">
+              <span>📱</span> UPI / QR Code
+            </button>
+            <button type="button" class="payment-tab-btn" data-tab="card">
+              <span>💳</span> Credit / Debit Card
+            </button>
+            <button type="button" class="payment-tab-btn" data-tab="netbanking">
+              <span>🏦</span> Net Banking
+            </button>
+          </div>
+
+          <!-- UPI Pane -->
+          <div id="pane-upi" class="payment-pane" style="text-align: center; padding: 20px 0;">
+            <div style="display: inline-block; padding: 16px; background: white; border: 2px dashed var(--accent-orange); border-radius: var(--radius-md); margin-bottom: 12px;">
+              <svg width="140" height="140" viewBox="0 0 100 100" fill="none">
+                <rect width="100" height="100" fill="#f8fafc"/>
+                <path d="M15 15h25v25h-25z M60 15h25v25h-25z M15 60h25v25h-25z" fill="#0b192c"/>
+                <rect x="22" y="22" width="11" height="11" fill="white"/>
+                <rect x="67" y="22" width="11" height="11" fill="white"/>
+                <rect x="22" y="67" width="11" height="11" fill="white"/>
+                <path d="M45 20h5v10h-5z M50 35h10v5h-10z M45 45h20v5h-20z M60 60h15v5h-15z M75 75h10v10h-10z" fill="#ff6500"/>
+              </svg>
+            </div>
+            <p style="font-size: 0.9rem; font-weight: 600; color: var(--primary-navy);">Scan with any UPI App (GPay, PhonePe, Paytm)</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">UPI ID: sainathbus@icici (Mock Gateway)</p>
+          </div>
+
+          <!-- Card Pane -->
+          <div id="pane-card" class="payment-pane" style="display: none; padding: 10px 0;">
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">Card Number</label>
+              <input type="text" class="form-control" placeholder="4111 •••• •••• 1111" value="4532 8920 1234 5678" style="padding-left: 14px;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label class="form-label">Expiry (MM/YY)</label>
+                <input type="text" class="form-control" placeholder="12/28" value="10/28" style="padding-left: 14px;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">CVV</label>
+                <input type="password" class="form-control" placeholder="•••" value="123" maxlength="3" style="padding-left: 14px;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Net Banking Pane -->
+          <div id="pane-netbanking" class="payment-pane" style="display: none; padding: 10px 0;">
+            <div class="form-group">
+              <label class="form-label">Choose Bank</label>
+              <select class="form-control" style="padding-left: 14px;">
+                <option>State Bank of India (SBI)</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>Axis Bank</option>
+                <option>Bank of Baroda</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Price Breakdown & CTA -->
+      <div>
+        <aside class="booking-summary-sidebar" style="position: sticky; top: 96px;">
+          <h3 class="sidebar-title">Payment Summary</h3>
+
+          <div class="summary-row">
+            <span style="color: var(--text-secondary);">Base Fare (<span id="pay-seats-count">0</span> seats)</span>
+            <span id="pay-base-fare">₹0</span>
+          </div>
+
+          <div class="summary-row">
+            <span style="color: var(--text-secondary);">GST & Convenience Tax</span>
+            <span id="pay-tax-fare">₹0</span>
+          </div>
+
+          <div class="summary-row total">
+            <span>Total Payable</span>
+            <span id="pay-total-fare" class="total-amount">₹0</span>
+          </div>
+
+          <div style="margin: 20px 0; padding: 12px; background: var(--bg-subtle); border-radius: var(--radius-md); font-size: 0.8rem; color: var(--text-secondary);">
+            ✅ <strong>Free Cancellation:</strong> Cancel anytime prior to 4 hours before departure with full seat release.
+          </div>
+
+          <button id="btn-confirm-pay" class="btn btn-primary btn-block btn-lg">
+            <span>💳</span> Confirm & Pay Now
+          </button>
+
+          <div id="booking-spinner" style="display: none; text-align: center; margin-top: 14px; font-size: 0.9rem; color: var(--secondary-navy); font-weight: 600;">
+            ⏳ Processing reservation & locking seats...
+          </div>
+        </aside>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      &copy; 2026 Sainath Bus Reservation System. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    let draft = null;
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const stored = sessionStorage.getItem('sainath_booking_draft');
+      if (!stored) {
+        showToast('No booking draft found', 'error');
+        setTimeout(() => window.location.href = 'buses.html', 1500);
+        return;
+      }
+
+      draft = JSON.parse(stored);
+
+      // Check Authentication Status
+      try {
+        const auth = await api.auth.me();
+        if (auth.authenticated && auth.user) {
+          currentUser = auth.user;
+          document.getElementById('auth-required-box').style.display = 'none';
+        } else {
+          document.getElementById('auth-required-box').style.display = 'block';
+        }
+      } catch (e) {
+        console.warn('Auth check failed', e);
+      }
+
+      // Populate Journey Overview
+      document.getElementById('summary-bus-name').textContent = draft.bus.bus_name;
+      document.getElementById('summary-bus-number').textContent = `Bus No: ${draft.bus.bus_no}`;
+      document.getElementById('summary-bus-type').textContent = draft.bus.bus_type;
+      document.getElementById('summary-journey-date').textContent = formatDate(draft.bus.travel_date);
+      document.getElementById('summary-src-city').textContent = draft.bus.source;
+      document.getElementById('summary-dst-city').textContent = draft.bus.destination;
+      document.getElementById('summary-dep-time').textContent = formatTime(draft.bus.departure_time);
+      document.getElementById('summary-arr-time').textContent = formatTime(draft.bus.arrival_time);
+      document.getElementById('summary-duration').textContent = draft.bus.duration || '6h';
+
+      // Populate Passengers Table
+      const tableBody = document.getElementById('passengers-table-body');
+      tableBody.innerHTML = (draft.passengers || []).map(p => `
+        <tr>
+          <td><span class="seat-chip">Seat ${p.seat_no}</span></td>
+          <td style="font-weight: 600; color: var(--primary-navy);">${escapeHtml(p.name)}</td>
+          <td>${p.age} yrs</td>
+          <td>${escapeHtml(p.gender)}</td>
+          <td style="text-align: right; font-weight: 700; color: var(--accent-orange);">${formatINR(draft.bus.fare)}</td>
+        </tr>
+      `).join('');
+
+      // Populate Sidebar Fares
+      const seatsCount = (draft.passengers || []).length;
+      document.getElementById('pay-seats-count').textContent = seatsCount;
+      document.getElementById('pay-base-fare').textContent = formatINR(draft.baseFare);
+      document.getElementById('pay-tax-fare').textContent = formatINR(draft.tax);
+      document.getElementById('pay-total-fare').textContent = formatINR(draft.totalFare);
+
+      // Payment tab toggle
+      document.querySelectorAll('.payment-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.payment-tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const tab = btn.dataset.tab;
+          document.querySelectorAll('.payment-pane').forEach(p => p.style.display = 'none');
+          const target = document.getElementById(`pane-${tab}`);
+          if (target) target.style.display = 'block';
+        });
+      });
+
+      // Confirm & Pay Click Handler
+      document.getElementById('btn-confirm-pay').addEventListener('click', async () => {
+        // Guard: check authentication
+        if (!currentUser) {
+          showToast('Please log in before confirming your booking', 'error');
+          setTimeout(() => {
+            window.location.href = 'login.html?redirect=booking.html';
+          }, 1200);
+          return;
+        }
+
+        const btn = document.getElementById('btn-confirm-pay');
+        const spinner = document.getElementById('booking-spinner');
+
+        btn.disabled = true;
+        spinner.style.display = 'block';
+
+        try {
+          const res = await api.bookings.create(draft.bus.bus_id, draft.passengers);
+          
+          showToast('Reservation Confirmed! Generating Ticket...', 'success');
+
+          // Save completed booking info for success page
+          sessionStorage.setItem('sainath_last_ticket', JSON.stringify({
+            bookingRef: res.booking.bookingRef,
+            bus: res.booking.bus,
+            seats: res.booking.seatNumbers,
+            totalFare: res.booking.totalFare,
+            passengers: draft.passengers,
+            contact: draft.contact
+          }));
+
+          // Clean up draft
+          sessionStorage.removeItem('sainath_booking_draft');
+
+          setTimeout(() => {
+            window.location.href = `booking-success.html?ref=${encodeURIComponent(res.booking.bookingRef)}`;
+          }, 1000);
+        } catch (err) {
+          btn.disabled = false;
+          spinner.style.display = 'none';
+          showToast(err.message || 'Booking failed. Please try again.', 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

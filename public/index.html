@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sainath Bus Reservation - Book Volvo, AC Sleeper and luxury buses online across Kurnool, Vijayawada, Visakhapatnam, Tirupati, Hyderabad, Bengaluru, Chennai, Mumbai and Shirdi.">
+  <title>Sainath Bus Reservation - Andhra Pradesh & Major Indian Routes</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" id="header-brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.6 19.1 6 18 6H4c-1.1 0-2.1.6-2.4 1.8l-1.4 5c-.1.4-.2.8-.2 1.2 0 .4.1.8.2 1.2.3 1.1.8 2.8.8 2.8h3"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="buses.html" class="nav-link">Search Buses</a></li>
+          <li><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-auth-buttons" id="navbar-auth">
+        <!-- Injected dynamically via api.js -->
+        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Modern Hero Section -->
+  <section class="hero-wrapper-modern">
+    <div class="container">
+      
+      <!-- Top Hero Header with Luxury Bus Presentation -->
+      <div class="hero-grid-showcase">
+        <div>
+          <div class="hero-badge">
+            <span>✨</span> Andhra Pradesh & Interstate Luxury Travel
+          </div>
+          <h1 class="hero-title" style="font-size: 2.85rem; margin-bottom: 14px;">
+            Your Journey, <span>Your Comfort.</span>
+          </h1>
+          <p class="hero-subtitle" style="margin: 0 0 24px 0; max-width: 620px;">
+            Book trusted bus journeys across Andhra Pradesh, Telangana and major Indian destinations. Enjoy verified fleet standards, live seat selection and transparent bookings.
+          </p>
+
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: #cbd5e1; font-weight: 500;">
+              <span style="color: var(--accent-orange); font-size: 1.1rem;">✓</span> Rayalaseema & Coastal AP Hubs
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: #cbd5e1; font-weight: 500;">
+              <span style="color: var(--accent-orange); font-size: 1.1rem;">✓</span> Multi-Axle Volvo & AC Sleepers
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: #cbd5e1; font-weight: 500;">
+              <span style="color: var(--accent-orange); font-size: 1.1rem;">✓</span> Real-Time Seat Availability
+            </div>
+          </div>
+        </div>
+
+        <!-- Flagship Luxury Bus Visual Presentation (Single Hero Image) -->
+        <div class="hero-bus-visual">
+          <img src="images/hero-bus.jpg" alt="Sainath Royal Volvo 9600 Multi-Axle Luxury Sleeper Coach">
+          <div class="hero-bus-badge">
+            <span class="badge-dot"></span>
+            <span>🚍 Sainath Royal Volvo 9600 Multi-Axle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Integrated Floating Bus Search Card -->
+      <div class="search-card" style="margin-top: 0;">
+        
+        <!-- Validation Warning Container -->
+        <div id="search-validation-banner" class="search-validation-msg"></div>
+
+        <form id="bus-search-form" class="search-form" autocomplete="off">
+          
+          <!-- From City Autocomplete -->
+          <div class="form-group">
+            <label class="form-label" for="search-source">
+              <span>📍</span> From (Boarding City)
+            </label>
+            <div class="autocomplete-wrapper">
+              <span class="input-icon">🚩</span>
+              <input type="text" id="search-source" class="form-control" placeholder="e.g. Kurnool" required autocomplete="off">
+              <button type="button" id="btn-clear-source" class="btn-clear-input" title="Clear city">✕</button>
+              <div id="source-autocomplete-dropdown" class="autocomplete-dropdown"></div>
+            </div>
+          </div>
+
+          <!-- Swap Origin / Destination Button -->
+          <div style="display: flex; align-items: flex-end;">
+            <button type="button" id="btn-swap-cities" class="swap-btn" title="Swap Cities" aria-label="Swap origin and destination">
+              ⇄
+            </button>
+          </div>
+
+          <!-- To City Autocomplete -->
+          <div class="form-group">
+            <label class="form-label" for="search-destination">
+              <span>🏁</span> To (Destination City)
+            </label>
+            <div class="autocomplete-wrapper">
+              <span class="input-icon">🎯</span>
+              <input type="text" id="search-destination" class="form-control" placeholder="e.g. Hyderabad" required autocomplete="off">
+              <button type="button" id="btn-clear-dest" class="btn-clear-input" title="Clear city">✕</button>
+              <div id="dest-autocomplete-dropdown" class="autocomplete-dropdown"></div>
+            </div>
+          </div>
+
+          <!-- Compact Custom Date Picker -->
+          <div class="form-group">
+            <label class="form-label" for="search-date-display">
+              <span>📅</span> Travel Date
+            </label>
+            <div class="custom-date-container">
+              <span class="input-icon">🗓️</span>
+              <input type="text" id="search-date-display" class="form-control" placeholder="Select date" readonly style="cursor: pointer; background: white;">
+              <input type="hidden" id="search-date" name="travel_date">
+              <div id="calendar-popup" class="custom-calendar-popup"></div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-lg" id="btn-search-buses">
+              <span>🔍</span> Search Buses
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Routes for Andhra Pradesh -->
+        <div class="quick-routes">
+          <span class="quick-routes-label">Popular AP Routes:</span>
+          <button type="button" class="route-chip" data-src="Kurnool" data-dst="Hyderabad">Kurnool ➔ Hyderabad</button>
+          <button type="button" class="route-chip" data-src="Kurnool" data-dst="Bengaluru">Kurnool ➔ Bengaluru</button>
+          <button type="button" class="route-chip" data-src="Kurnool" data-dst="Vijayawada">Kurnool ➔ Vijayawada</button>
+          <button type="button" class="route-chip" data-src="Kurnool" data-dst="Tirupati">Kurnool ➔ Tirupati</button>
+          <button type="button" class="route-chip" data-src="Vijayawada" data-dst="Visakhapatnam">Vijayawada ➔ Visakhapatnam</button>
+          <button type="button" class="route-chip" data-src="Guntur" data-dst="Hyderabad">Guntur ➔ Hyderabad</button>
+          <button type="button" class="route-chip" data-src="Tirupati" data-dst="Chennai">Tirupati ➔ Chennai</button>
+          <button type="button" class="route-chip" data-src="Nandyal" data-dst="Bengaluru">Nandyal ➔ Bengaluru</button>
+          <button type="button" class="route-chip" data-src="Kadapa" data-dst="Hyderabad">Kadapa ➔ Hyderabad</button>
+          <button type="button" class="route-chip" data-src="Anantapur" data-dst="Bengaluru">Anantapur ➔ Bengaluru</button>
+          <button type="button" class="route-chip" data-src="Visakhapatnam" data-dst="Vijayawada">Visakhapatnam ➔ Vijayawada</button>
+          <button type="button" class="route-chip" data-src="Kurnool" data-dst="Nandyal">Kurnool ➔ Nandyal</button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 1. Popular Andhra Pradesh Routes Section -->
+  <section style="padding: 70px 0; background: var(--bg-main);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Direct Departures</span>
+        <h2 class="section-title">Popular Andhra Pradesh Routes</h2>
+        <p class="section-desc">Reliable daily coach services connecting Rayalaseema, Coastal Andhra and major interstate metro corridors.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 20px;">
+        
+        <div class="card" style="border-top: 4px solid var(--accent-orange); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">Kurnool ➔ Hyderabad</span>
+              <span style="color: var(--accent-orange); font-weight: 800; font-size: 1.15rem;">₹380+</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">Express highway service via NH44. Multiple morning, afternoon and overnight sleeper departures.</p>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">⏱️ Duration: 3h 45m • 4 Daily Buses</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Kurnool" data-dst="Hyderabad">
+            View Buses
+          </button>
+        </div>
+
+        <div class="card" style="border-top: 4px solid var(--accent-orange); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">Kurnool ➔ Bengaluru</span>
+              <span style="color: var(--accent-orange); font-weight: 800; font-size: 1.15rem;">₹650+</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">Direct Silicon Corridor luxury Volvo multi-axle & night sleeper connecting to Majestic and Electronic City.</p>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">⏱️ Duration: 6h 00m • 3 Daily Buses</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Kurnool" data-dst="Bengaluru">
+            View Buses
+          </button>
+        </div>
+
+        <div class="card" style="border-top: 4px solid var(--accent-orange); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">Vijayawada ➔ Vizag</span>
+              <span style="color: var(--accent-orange); font-weight: 800; font-size: 1.15rem;">₹700+</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">Fast coastal express via Rajahmundry. Luxury reclining and AC sleeper coaches.</p>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">⏱️ Duration: 6h 00m • 2 Daily Buses</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Vijayawada" data-dst="Visakhapatnam">
+            View Buses
+          </button>
+        </div>
+
+        <div class="card" style="border-top: 4px solid var(--accent-orange); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">Kurnool ➔ Tirupati</span>
+              <span style="color: var(--accent-orange); font-weight: 800; font-size: 1.15rem;">₹580+</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">Pilgrim special express reaching Tirupati RTC central bus stand with smooth morning & night timings.</p>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">⏱️ Duration: 7h 00m • 2 Daily Buses</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Kurnool" data-dst="Tirupati">
+            View Buses
+          </button>
+        </div>
+
+        <div class="card" style="border-top: 4px solid var(--accent-orange); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">Guntur ➔ Hyderabad</span>
+              <span style="color: var(--accent-orange); font-weight: 800; font-size: 1.15rem;">₹550+</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">Smooth highway connectivity via Miryalaguda and Nalgonda to LB Nagar, Ameerpet & Miyapur.</p>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">⏱️ Duration: 5h 30m • 2 Daily Buses</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Guntur" data-dst="Hyderabad">
+            View Buses
+          </button>
+        </div>
+
+        <div class="card" style="border-top: 4px solid var(--accent-orange); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; color: var(--primary-navy); font-size: 1.1rem;">Tirupati ➔ Chennai</span>
+              <span style="color: var(--accent-orange); font-weight: 800; font-size: 1.15rem;">₹380+</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">Frequent morning and evening departures connecting Tirupati temple foothills with CMBT Koyambedu.</p>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">⏱️ Duration: 3h 30m • 2 Daily Buses</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Tirupati" data-dst="Chennai">
+            View Buses
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Dedicated Luxury Bus Fleet Showcase -->
+  <section style="padding: 75px 0; background: white; border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Flagship Comfort</span>
+        <h2 class="section-title">Our Premium Luxury Fleet</h2>
+        <p class="section-desc">Experience unmatched highway stability, plush individual sleeping berths, and next-generation safety on every journey.</p>
+      </div>
+
+      <div class="fleet-cards-grid">
+        <!-- Bus 1: Volvo 9600 -->
+        <div class="fleet-showcase-card">
+          <div class="fleet-photo-box">
+            <img src="images/hero-bus.jpg" alt="Sainath Royal Volvo 9600 Multi-Axle">
+            <div class="fleet-photo-tag">Flagship Sleeper</div>
+          </div>
+          <div class="fleet-card-body">
+            <div>
+              <h3 class="fleet-model-title">Sainath Royal Volvo 9600</h3>
+              <p class="fleet-desc">Top-of-the-line European luxury multi-axle coach with whisper-quiet cruising and electronically controlled air suspension.</p>
+              
+              <div class="fleet-pills-list">
+                <span class="fleet-pill">🛏️ 2+1 AC Sleeper</span>
+                <span class="fleet-pill">⚡ 220V Fast Charge</span>
+                <span class="fleet-pill">❄️ Individual AC Vents</span>
+                <span class="fleet-pill">📶 GPS Tracked</span>
+              </div>
+
+              <div class="fleet-routes-bar">
+                <span>📍 Key Routes:</span> Kurnool ➔ Hyderabad • Kurnool ➔ Bengaluru
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Kurnool" data-dst="Hyderabad">
+              Check Volvo 9600 Schedules
+            </button>
+          </div>
+        </div>
+
+        <!-- Bus 2: Mercedes-Benz AC Sleeper -->
+        <div class="fleet-showcase-card">
+          <div class="fleet-photo-box">
+            <img src="images/hero-bus-2.jpg" alt="Sainath Mercedes-Benz Royal Cruise Sleeper">
+            <div class="fleet-photo-tag">Royal Cruise</div>
+          </div>
+          <div class="fleet-card-body">
+            <div>
+              <h3 class="fleet-model-title">Mercedes-Benz Royal Sleeper</h3>
+              <p class="fleet-desc">Aerodynamic high-speed highway coach engineered for vibration-free overnight sleep with soft memory foam berths.</p>
+              
+              <div class="fleet-pills-list">
+                <span class="fleet-pill">✨ Premium Interiors</span>
+                <span class="fleet-pill">🛌 Sanitized Bedding</span>
+                <span class="fleet-pill">🛡️ ABS & ESC Safety</span>
+                <span class="fleet-pill">💡 Ambient Reading Lights</span>
+              </div>
+
+              <div class="fleet-routes-bar">
+                <span>📍 Key Routes:</span> Vijayawada ➔ Vizag • Kurnool ➔ Tirupati
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Vijayawada" data-dst="Visakhapatnam">
+              Check Royal Cruise Schedules
+            </button>
+          </div>
+        </div>
+
+        <!-- Bus 3: Velocity Multi-Axle High-Deck -->
+        <div class="fleet-showcase-card">
+          <div class="fleet-photo-box">
+            <img src="images/hero-bus-3.jpg" alt="Sainath Velocity High-Deck Express">
+            <div class="fleet-photo-tag">Panoramic High-Deck</div>
+          </div>
+          <div class="fleet-card-body">
+            <div>
+              <h3 class="fleet-model-title">Sainath Velocity High-Deck</h3>
+              <p class="fleet-desc">High-deck passenger cabin offering panoramic highway vistas, extra luggage capacity, and dual-driver assurance.</p>
+              
+              <div class="fleet-pills-list">
+                <span class="fleet-pill">🔭 Panoramic Windows</span>
+                <span class="fleet-pill">💺 Deep Recline Seating</span>
+                <span class="fleet-pill">🧳 Oversized Luggage Bay</span>
+                <span class="fleet-pill">👨‍✈️ Dual Crew Drivers</span>
+              </div>
+
+              <div class="fleet-routes-bar">
+                <span>📍 Key Routes:</span> Guntur ➔ Hyderabad • Tirupati ➔ Chennai
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-outline btn-navy btn-sm btn-block trigger-quick-search" data-src="Guntur" data-dst="Hyderabad">
+              Check Velocity Schedules
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Explore by Destination Section -->
+  <section style="padding: 70px 0; background: var(--bg-main); border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Key Hubs & Destinations</span>
+        <h2 class="section-title">Explore Major Connected Cities</h2>
+        <p class="section-desc">Direct daily departures from Andhra Pradesh to leading regional and interstate business, pilgrim and holiday destinations.</p>
+      </div>
+
+      <div class="dest-grid">
+        
+        <div class="dest-card">
+          <div class="dest-card-header" style="background: linear-gradient(135deg, #1e3a8a, #0f172a);">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #ff9d5c; font-weight: 700;">TELANGANA HUB</span>
+            <div class="dest-city-title">Hyderabad</div>
+          </div>
+          <div class="dest-card-body">
+            <p class="dest-card-desc">High-frequency connections from Kurnool, Guntur, Vijayawada and Kadapa arriving at MGBS, Lakdikapul and Miyapur.</p>
+            <button type="button" class="btn btn-outline btn-navy btn-sm trigger-quick-search" data-src="Kurnool" data-dst="Hyderabad">
+              Find Hyderabad Buses
+            </button>
+          </div>
+        </div>
+
+        <div class="dest-card">
+          <div class="dest-card-header" style="background: linear-gradient(135deg, #065f46, #064e3b);">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #6ee7b7; font-weight: 700;">KARNATAKA HUB</span>
+            <div class="dest-city-title">Bengaluru</div>
+          </div>
+          <div class="dest-card-body">
+            <p class="dest-card-desc">Overnight sleepers and early Volvo coaches from Kurnool, Anantapur and Nandyal to Hebbal, Majestic and Silk Board.</p>
+            <button type="button" class="btn btn-outline btn-navy btn-sm trigger-quick-search" data-src="Kurnool" data-dst="Bengaluru">
+              Find Bengaluru Buses
+            </button>
+          </div>
+        </div>
+
+        <div class="dest-card">
+          <div class="dest-card-header" style="background: linear-gradient(135deg, #9a3412, #7c2d12);">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #fdba74; font-weight: 700;">PILGRIM SHRINE</span>
+            <div class="dest-city-title">Tirupati</div>
+          </div>
+          <div class="dest-card-body">
+            <p class="dest-card-desc">Sacred gateway to Sri Venkateswara Swamy temple. Daily express AC sleepers from Kurnool, Vijayawada and Chennai.</p>
+            <button type="button" class="btn btn-outline btn-navy btn-sm trigger-quick-search" data-src="Kurnool" data-dst="Tirupati">
+              Find Tirupati Buses
+            </button>
+          </div>
+        </div>
+
+        <div class="dest-card">
+          <div class="dest-card-header" style="background: linear-gradient(135deg, #1e40af, #1e3a8a);">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #93c5fd; font-weight: 700;">ANDHRA PRADESH</span>
+            <div class="dest-city-title">Vijayawada</div>
+          </div>
+          <div class="dest-card-body">
+            <p class="dest-card-desc">Central junction on the Krishna river. Direct express connectivity to Kurnool, Visakhapatnam, Hyderabad and Guntur.</p>
+            <button type="button" class="btn btn-outline btn-navy btn-sm trigger-quick-search" data-src="Kurnool" data-dst="Vijayawada">
+              Find Vijayawada Buses
+            </button>
+          </div>
+        </div>
+
+        <div class="dest-card">
+          <div class="dest-card-header" style="background: linear-gradient(135deg, #0e7490, #155e75);">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #67e8f9; font-weight: 700;">COASTAL PORT</span>
+            <div class="dest-city-title">Visakhapatnam</div>
+          </div>
+          <div class="dest-card-body">
+            <p class="dest-card-desc">The City of Destiny. Luxury AC coaches from Vijayawada and Rajahmundry connecting to RTC Complex, Gajuwaka and Maddilapalem.</p>
+            <button type="button" class="btn btn-outline btn-navy btn-sm trigger-quick-search" data-src="Vijayawada" data-dst="Visakhapatnam">
+              Find Vizag Buses
+            </button>
+          </div>
+        </div>
+
+        <div class="dest-card">
+          <div class="dest-card-header" style="background: linear-gradient(135deg, #4c1d95, #3b0764);">
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #d8b4fe; font-weight: 700;">TAMIL NADU HUB</span>
+            <div class="dest-city-title">Chennai</div>
+          </div>
+          <div class="dest-card-body">
+            <p class="dest-card-desc">Direct intercity multi-axle Volvos from Tirupati and Nellore arriving at Koyambedu CMBT and Central.</p>
+            <button type="button" class="btn btn-outline btn-navy btn-sm trigger-quick-search" data-src="Tirupati" data-dst="Chennai">
+              Find Chennai Buses
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Choose Your Bus Type Section -->
+  <section style="padding: 70px 0; background: var(--bg-main); border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Fleet Varieties</span>
+        <h2 class="section-title">Choose Your Bus Type</h2>
+        <p class="section-desc">From budget intercity seaters to ultra-luxury multi-axle Volvo sleepers, select what best fits your journey.</p>
+      </div>
+
+      <div class="bus-type-grid">
+        
+        <div class="bus-type-card">
+          <span style="font-size: 2rem;">🛌</span>
+          <h3 class="bus-type-card-title">AC Sleeper (2+1)</h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">Individual lower and upper sleeping berths designed for peaceful overnight travel.</p>
+          <ul class="bus-amenity-list">
+            <li><span>✓</span> Personal reading light & charging socket</li>
+            <li><span>✓</span> Sanitized bedsheet & pillow</li>
+            <li><span>✓</span> Privacy curtains on each berth</li>
+          </ul>
+        </div>
+
+        <div class="bus-type-card">
+          <span style="font-size: 2rem;">💺</span>
+          <h3 class="bus-type-card-title">AC Semi-Sleeper (2+2)</h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">Ergonomic deep-recline pushback seating with spacious legroom and calf support.</p>
+          <ul class="bus-amenity-list">
+            <li><span>✓</span> 135° recline with footrest</li>
+            <li><span>✓</span> Climate-controlled central air-conditioning</li>
+            <li><span>✓</span> Ample overhead luggage racks</li>
+          </ul>
+        </div>
+
+        <div class="bus-type-card">
+          <span style="font-size: 2rem;">⚡</span>
+          <h3 class="bus-type-card-title">Volvo Multi-Axle AC</h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">Flagship multi-axle coaches engineered for supreme stability and whisper-quiet cruising.</p>
+          <ul class="bus-amenity-list">
+            <li><span>✓</span> Electronically controlled air suspension</li>
+            <li><span>✓</span> High-speed smooth highway stability</li>
+            <li><span>✓</span> USB fast-charging ports at every seat</li>
+          </ul>
+        </div>
+
+        <div class="bus-type-card">
+          <span style="font-size: 2rem;">🚌</span>
+          <h3 class="bus-type-card-title">Non-AC Seater (2+2)</h3>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">Economic and prompt intercity day travel across regional towns and district hubs.</p>
+          <ul class="bus-amenity-list">
+            <li><span>✓</span> Budget-friendly passenger fares</li>
+            <li><span>✓</span> Wide sliding ventilation windows</li>
+            <li><span>✓</span> Convenient frequent departures</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience Luxury on the Road Split Banner -->
+  <section class="experience-spotlight-section">
+    <div class="container">
+      <div class="spotlight-grid">
+        <div class="spotlight-visual-wrapper">
+          <img src="images/hero-bus-2.jpg" alt="Sainath Mercedes-Benz Luxury Highway Experience">
+          <div class="spotlight-floating-card">
+            <span style="font-size: 1.8rem;">🌟</span>
+            <div>
+              <div style="font-size: 0.78rem; text-transform: uppercase; color: #ff9d5c; font-weight: 700;">ROYAL STANDARD</div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: white;">Guaranteed Comfort & On-Time Arrival</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="hero-badge" style="background: rgba(255, 101, 0, 0.15); color: #ff9d5c; border-color: rgba(255, 101, 0, 0.4); margin-bottom: 16px;">
+            <span>👑</span> The Sainath Travel Standard
+          </div>
+          <h2 style="font-family: var(--font-heading); font-size: 2.3rem; font-weight: 800; line-height: 1.25; margin-bottom: 16px;">
+            Travel First-Class on <span style="color: var(--accent-orange);">Every Highway</span>
+          </h2>
+          <p style="color: #cbd5e1; font-size: 0.98rem; line-height: 1.6; margin-bottom: 20px;">
+            We operate top-tier, multi-axle coaches maintained to strict commercial standards. Whether traveling for temple darshan, business meetings, or family visits, your comfort and security are guaranteed.
+          </p>
+
+          <div class="spotlight-features-list">
+            <div class="spotlight-feature-row">
+              <div class="spotlight-feature-icon">🛌</div>
+              <div>
+                <h4 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: white;">Fresh Sanitized Bedding & Privacy Curtains</h4>
+                <p style="font-size: 0.88rem; color: #94a3b8;">Clean linen, freshly laundered blankets and individual privacy curtains for undisturbed sleep.</p>
+              </div>
+            </div>
+
+            <div class="spotlight-feature-row">
+              <div class="spotlight-feature-icon">🛰️</div>
+              <div>
+                <h4 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: white;">Live GPS Tracking & Route Monitoring</h4>
+                <p style="font-size: 0.88rem; color: #94a3b8;">Real-time bus tracking and speed monitoring for passenger safety and precise pickup timekeeping.</p>
+              </div>
+            </div>
+
+            <div class="spotlight-feature-row">
+              <div class="spotlight-feature-icon">👨‍✈️</div>
+              <div>
+                <h4 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: white;">Senior Dual-Crew Drivers</h4>
+                <p style="font-size: 0.88rem; color: #94a3b8;">Experienced commercial highway captains with rotational driving on long-distance routes.</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <a href="buses.html" class="btn btn-primary btn-lg" id="spotlight-search-btn">
+              <span>🔍</span> Book a Luxury Bus
+            </a>
+            <a href="buses.html?source=Kurnool&destination=Bengaluru" class="btn btn-outline btn-lg" style="color: white; border-color: rgba(255,255,255,0.3);">
+              View Volvo Sleeper Routes
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Why Choose Sainath? Section -->
+  <section style="padding: 70px 0; background: white; border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Direct Benefits</span>
+        <h2 class="section-title">Why Choose Sainath Bus Reservation?</h2>
+        <p class="section-desc">Experience seamless bus booking backed by real seat locks, straightforward cancellation and dedicated support.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Live Interactive Seat Map</h3>
+          <p class="feature-text">Select your exact seat on a 40-seat coach layout with real-time indicators for window, aisle and sleeper positions.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Transparent Pricing</h3>
+          <p class="feature-text">Clear fares with standard tax breakdown. No surprise checkout fees added at the payment step.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">One-Click Cancellation</h3>
+          <p class="feature-text">Plans changed? Easily cancel your confirmed booking in My Bookings with immediate seat release back to the inventory.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Instant Digital E-Ticket</h3>
+          <p class="feature-text">Generate your verified boarding pass immediately with booking reference, conductor barcode, and printable receipt.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. How It Works Section -->
+  <section style="padding: 70px 0; background: var(--bg-main); border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Booking Guide</span>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-desc">Reserve your bus seat in 4 simple steps without standing in long ticket counters.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number-badge">1</div>
+          <h3 class="step-title">Search Buses</h3>
+          <p class="step-desc">Enter your origin, destination and travel date using the smart autocomplete and compact calendar.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number-badge">2</div>
+          <h3 class="step-title">Select Seats</h3>
+          <p class="step-desc">Pick your preferred window or aisle seats from the interactive 40-seat coach map with real-time fares.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number-badge">3</div>
+          <h3 class="step-title">Enter Details</h3>
+          <p class="step-desc">Fill in passenger names, age, gender and primary contact info for your travel confirmation.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number-badge">4</div>
+          <h3 class="step-title">Confirm & Travel</h3>
+          <p class="step-desc">Review summary, confirm booking, and instantly download or print your official e-ticket pass.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Trust & Real Safety Standards Section -->
+  <section style="padding: 70px 0; background: white; border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Our Practical Commitment</span>
+        <h2 class="section-title">Safety & Passenger Care</h2>
+        <p class="section-desc">Practical measures we take on every route to ensure a secure, hygienic and comfortable travel experience.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+        <div class="card" style="border-left: 4px solid var(--status-success);">
+          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 8px;">🛰️ Active GPS Highway Tracking</h4>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Every coach on intercity routes is tracked for route adherence and passenger safety.</p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid var(--status-success);">
+          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 8px;">🧼 Sanitized Coaches & Clean Linen</h4>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Coaches undergo thorough interior cleaning and fresh washed bedding replacement prior to departure.</p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid var(--status-success);">
+          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 8px;">👨‍✈️ Verified Commercial Drivers</h4>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Experienced drivers with commercial heavy-vehicle licenses and dedicated dual-crew on long-haul routes.</p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid var(--status-success);">
+          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 8px;">📞 Dedicated Passenger Support</h4>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">Direct helpline support for boarding point inquiries, delay updates and ticket modifications.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Sainath <span>Bus Reservation</span></div>
+          <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 16px;">
+            Your trusted travel companion for reliable, safe and comfortable bus journeys across Andhra Pradesh, Telangana, Karnataka, Tamil Nadu and Maharashtra.
+          </p>
+          <p style="font-size: 0.85rem; color: #94a3b8;">
+            📞 24x7 Customer Helpline: +91 98765 43210<br>
+            ✉️ Email Support: support@sainathbus.com
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Popular AP Routes</h4>
+          <ul class="footer-links">
+            <li><a href="buses.html?source=Kurnool&destination=Hyderabad">Kurnool to Hyderabad</a></li>
+            <li><a href="buses.html?source=Kurnool&destination=Bengaluru">Kurnool to Bengaluru</a></li>
+            <li><a href="buses.html?source=Vijayawada&destination=Visakhapatnam">Vijayawada to Vizag</a></li>
+            <li><a href="buses.html?source=Kurnool&destination=Tirupati">Kurnool to Tirupati</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Major Destinations</h4>
+          <ul class="footer-links">
+            <li><a href="buses.html?destination=Hyderabad">Hyderabad</a></li>
+            <li><a href="buses.html?destination=Bengaluru">Bengaluru</a></li>
+            <li><a href="buses.html?destination=Tirupati">Tirupati</a></li>
+            <li><a href="buses.html?destination=Vijayawada">Vijayawada</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Account & Bookings</h4>
+          <ul class="footer-links">
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register New Account</a></li>
+            <li><a href="my-bookings.html">My Bookings</a></li>
+            <li><a href="profile.html">Profile & Password</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        &copy; 2026 Sainath Bus Reservation System. All Rights Reserved. Designed for safe & seamless journeys.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/search-components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Setup Autocomplete on Origin and Destination inputs
+      setupCityAutocomplete(
+        'search-source', 
+        'btn-clear-source', 
+        'source-autocomplete-dropdown', 
+        'search-destination'
+      );
+
+      setupCityAutocomplete(
+        'search-destination', 
+        'btn-clear-dest', 
+        'dest-autocomplete-dropdown', 
+        'search-source'
+      );
+
+      // 2. Setup Compact Custom Date Picker
+      setupCustomDatePicker('search-date-display', 'search-date', 'calendar-popup');
+
+      // 3. City swap button
+      document.getElementById('btn-swap-cities').addEventListener('click', () => {
+        const srcInput = document.getElementById('search-source');
+        const dstInput = document.getElementById('search-destination');
+        const clearSrc = document.getElementById('btn-clear-source');
+        const clearDst = document.getElementById('btn-clear-dest');
+
+        const temp = srcInput.value;
+        srcInput.value = dstInput.value;
+        dstInput.value = temp;
+
+        if (clearSrc) clearSrc.style.display = srcInput.value ? 'flex' : 'none';
+        if (clearDst) clearDst.style.display = dstInput.value ? 'flex' : 'none';
+        clearValidationWarning();
+      });
+
+      // 4. Quick route chips click handler
+      document.querySelectorAll('.route-chip, .trigger-quick-search').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const src = chip.dataset.src;
+          const dst = chip.dataset.dst;
+
+          const srcInput = document.getElementById('search-source');
+          const dstInput = document.getElementById('search-destination');
+          const dateInput = document.getElementById('search-date');
+
+          srcInput.value = src;
+          dstInput.value = dst;
+
+          document.getElementById('btn-clear-source').style.display = 'flex';
+          document.getElementById('btn-clear-dest').style.display = 'flex';
+          clearValidationWarning();
+
+          // Smoothly trigger the search
+          window.location.href = `buses.html?source=${encodeURIComponent(src)}&destination=${encodeURIComponent(dst)}&date=${encodeURIComponent(dateInput.value)}`;
+        });
+      });
+
+      // 5. Search form submission handler
+      document.getElementById('bus-search-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const source = document.getElementById('search-source').value.trim();
+        const destination = document.getElementById('search-destination').value.trim();
+        const date = document.getElementById('search-date').value;
+
+        if (!source || !destination) {
+          showValidationWarning('Please provide both origin and destination cities.');
+          return;
+        }
+
+        if (source.toLowerCase() === destination.toLowerCase()) {
+          showValidationWarning('Origin and destination cannot be the exact same city.');
+          return;
+        }
+
+        clearValidationWarning();
+        window.location.href = `buses.html?source=${encodeURIComponent(source)}&destination=${encodeURIComponent(destination)}&date=${encodeURIComponent(date)}`;
+      });
+    });
+  </script>
+</body>
+</html>

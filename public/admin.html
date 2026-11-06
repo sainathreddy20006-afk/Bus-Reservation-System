@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage Sainath Bus Reservation bookings, members, and buses.">
+  <title>Admin Console - Sainath Bus Reservation</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-page { padding: 36px 24px 76px; }
+    .admin-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 34px;
+      border-radius: 26px;
+      color: white;
+      background: linear-gradient(125deg, #0b192c 5%, #1e3e62 70%, #275489);
+      box-shadow: 0 18px 42px rgba(11,25,44,.18);
+    }
+    .admin-hero::after {
+      content: "🚌";
+      position: absolute;
+      right: 6%;
+      top: 6px;
+      font-size: clamp(5rem, 12vw, 9rem);
+      opacity: .12;
+      transform: rotate(-8deg);
+    }
+    .admin-kicker { color: #ffb17b; font-size: .78rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .admin-hero h1 { position: relative; z-index: 1; margin: 7px 0; color: white; font: 700 clamp(1.8rem,4vw,2.7rem)/1.1 var(--font-heading); }
+    .admin-hero p { position: relative; z-index: 1; max-width: 580px; color: #d8e3f0; }
+    .admin-hero-tools { position: absolute; z-index: 2; right: 28px; bottom: 26px; }
+    .admin-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin:22px 0; }
+    .admin-stat { padding:20px; border:1px solid var(--border-color); border-radius:18px; background:white; box-shadow:var(--shadow-sm); }
+    .admin-stat-label { color:var(--text-secondary); font-size:.82rem; font-weight:700; }
+    .admin-stat-value { margin-top:5px; color:var(--primary-navy); font:800 2rem/1.2 var(--font-heading); }
+    .admin-stat-icon { float:right; display:grid; width:38px; height:38px; place-items:center; border-radius:12px; background:var(--accent-orange-light); font-size:1.1rem; }
+    .admin-workspace { display:grid; grid-template-columns:220px minmax(0,1fr); gap:18px; align-items:start; }
+    .admin-tabs { position:sticky; top:90px; display:grid; gap:7px; padding:12px; border:1px solid var(--border-color); border-radius:18px; background:#fff; box-shadow:var(--shadow-sm); }
+    .admin-tab { display:flex; align-items:center; gap:10px; width:100%; padding:12px; border:0; border-radius:12px; background:transparent; color:var(--text-secondary); font:600 .92rem var(--font-body); text-align:left; cursor:pointer; }
+    .admin-tab:hover { background:var(--bg-subtle); color:var(--primary-navy); }
+    .admin-tab.active { background:var(--primary-navy); color:white; }
+    .admin-panel { display:none; min-width:0; overflow:hidden; border:1px solid var(--border-color); border-radius:18px; background:white; box-shadow:var(--shadow-sm); }
+    .admin-panel.active { display:block; }
+    .admin-panel-head { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:21px 22px; border-bottom:1px solid var(--border-color); }
+    .admin-panel-head h2 { color:var(--primary-navy); font:700 1.2rem var(--font-heading); }
+    .admin-panel-head p { color:var(--text-muted); font-size:.83rem; }
+    .admin-tools { display:flex; flex-wrap:wrap; align-items:center; gap:9px; }
+    .admin-search { width:min(250px,55vw); min-height:40px; padding:8px 12px; border:1px solid var(--border-color); border-radius:10px; outline:none; }
+    .admin-search:focus,.admin-form-control:focus { border-color:var(--accent-orange); box-shadow:0 0 0 3px rgba(255,101,0,.12); }
+    .admin-table-wrap { overflow:auto; max-height:66vh; }
+    .admin-table { width:100%; border-collapse:collapse; min-width:1100px; }
+    .admin-table th,.admin-table td { padding:13px 14px; border-bottom:1px solid #edf0f4; text-align:left; vertical-align:top; font-size:.82rem; }
+    .admin-table th { position:sticky; top:0; z-index:1; background:#f6f8fb; color:#64748b; font-size:.73rem; letter-spacing:.05em; text-transform:uppercase; white-space:nowrap; }
+    .admin-table tr:hover td { background:#fbfcfe; }
+    .admin-table td strong { color:var(--primary-navy); }
+    .admin-muted { color:#7c8999; font-size:.76rem; }
+    .admin-status { display:inline-flex; padding:4px 9px; border-radius:999px; font-size:.72rem; font-weight:800; }
+    .admin-status.confirmed,.admin-status.active { background:#e9f9f0; color:#087443; }
+    .admin-status.cancelled,.admin-status.inactive { background:#fff1f0; color:#b42318; }
+    .admin-row-actions { display:flex; gap:6px; white-space:nowrap; }
+    .admin-action { padding:6px 9px; border:1px solid var(--border-color); border-radius:8px; background:white; color:var(--secondary-navy); font-size:.76rem; font-weight:700; cursor:pointer; }
+    .admin-action:hover { border-color:var(--accent-orange); color:var(--accent-orange); }
+    .admin-action.danger { color:#b42318; }
+    .admin-empty,.admin-loading { padding:38px 18px; color:var(--text-secondary); text-align:center; }
+    .admin-modal { position:fixed; inset:0; z-index:5000; display:none; place-items:center; padding:18px; background:rgba(11,25,44,.6); backdrop-filter:blur(4px); }
+    .admin-modal.open { display:grid; }
+    .admin-modal-card { width:min(760px,100%); max-height:92vh; overflow:auto; padding:24px; border-radius:20px; background:white; box-shadow:0 25px 65px rgba(0,0,0,.24); }
+    .admin-modal-card h2 { margin-bottom:5px; color:var(--primary-navy); font:700 1.35rem var(--font-heading); }
+    .admin-modal-card > p { margin-bottom:20px; color:var(--text-secondary); font-size:.87rem; }
+    .admin-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; }
+    .admin-field label { display:block; margin-bottom:5px; color:var(--text-secondary); font-size:.77rem; font-weight:700; }
+    .admin-form-control { width:100%; min-height:42px; padding:9px 11px; border:1px solid var(--border-color); border-radius:10px; outline:none; background:white; }
+    .admin-modal-actions { display:flex; justify-content:flex-end; gap:9px; margin-top:20px; }
+    .admin-skeleton { height:14px; margin:12px; border-radius:99px; background:linear-gradient(90deg,#f1f5f9,#e2e8f0,#f1f5f9); background-size:200% 100%; animation:admin-shimmer 1.4s infinite; }
+    @keyframes admin-shimmer { to { background-position:-200% 0; } }
+    @media(max-width:900px) {
+      .admin-workspace { grid-template-columns:1fr; }
+      .admin-tabs { position:static; display:flex; overflow:auto; }
+      .admin-tab { width:auto; white-space:nowrap; }
+    }
+    @media(max-width:650px) {
+      .admin-page { padding:22px 16px 54px; }
+      .admin-hero { padding:25px 21px 78px; }
+      .admin-hero-tools { right:18px; bottom:18px; }
+      .admin-stats { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+      .admin-stat { padding:15px; }
+      .admin-stat-value { font-size:1.65rem; }
+      .admin-panel-head { align-items:flex-start; flex-direction:column; padding:17px; }
+      .admin-form-grid { grid-template-columns:1fr; }
+      .admin-modal-card { padding:19px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="buses.html" class="nav-link">Search Buses</a></li>
+          <li><a href="admin.html" class="nav-link active">Admin Console</a></li>
+        </ul>
+      </nav>
+      <div class="nav-auth-buttons" id="navbar-auth"></div>
+    </div>
+  </header>
+
+  <main class="container admin-page">
+    <section class="admin-hero">
+      <div class="admin-kicker">Sainath Operations</div>
+      <h1>Admin command center</h1>
+      <p>See every reservation as it happens. Manage your buses, members, and passenger bookings from one place.</p>
+      <div class="admin-hero-tools">
+        <button type="button" class="btn btn-primary btn-sm" id="refresh-dashboard">↻ Refresh data</button>
+      </div>
+    </section>
+
+    <section id="dashboard-stats" class="admin-stats" aria-label="Live system totals"></section>
+    <div id="dashboard-error" class="alert alert-danger" style="display:none;"></div>
+    <div id="dashboard-loading" class="admin-panel active"><div class="admin-skeleton"></div><div class="admin-skeleton"></div><div class="admin-skeleton"></div></div>
+
+    <div id="dashboard-content" class="admin-workspace" style="display:none;">
+      <nav class="admin-tabs" aria-label="Admin management">
+        <button type="button" class="admin-tab active" data-panel="bookings-panel">🎟️ Bookings</button>
+        <button type="button" class="admin-tab" data-panel="buses-panel">🚌 Buses</button>
+        <button type="button" class="admin-tab" data-panel="members-panel">👥 Members</button>
+      </nav>
+
+      <section id="bookings-panel" class="admin-panel active">
+        <div class="admin-panel-head">
+          <div><h2>All bookings</h2><p>Passenger details, contact details, seat, status, fare, and trip information.</p></div>
+          <div class="admin-tools">
+            <input class="admin-search" id="booking-search" type="search" placeholder="Search bookings">
+            <select class="admin-form-control" id="booking-status-filter" aria-label="Filter booking status" style="width:auto;">
+              <option value="ALL">All statuses</option><option value="CONFIRMED">Confirmed</option><option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr>
+              <th>Booking / Status</th><th>Account Contact</th><th>Passenger</th><th>Bus &amp; Route</th>
+              <th>Travel</th><th>Seat</th><th>Fare</th><th>Manage</th>
+            </tr></thead>
+            <tbody id="bookings-table"></tbody>
+          </table>
+          <div id="bookings-empty" class="admin-empty" style="display:none;">No bookings match this filter.</div>
+        </div>
+      </section>
+
+      <section id="buses-panel" class="admin-panel">
+        <div class="admin-panel-head">
+          <div><h2>Bus fleet</h2><p>Update schedules and fares. Removed buses are archived so booking history is kept.</p></div>
+          <div class="admin-tools">
+            <input class="admin-search" id="bus-search" type="search" placeholder="Search buses">
+            <button type="button" class="btn btn-primary btn-sm" id="add-bus-button">+ Add bus</button>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr>
+              <th>Bus</th><th>Route</th><th>Travel date</th><th>Schedule</th><th>Fare</th><th>Seats</th><th>Sale status</th><th>Manage</th>
+            </tr></thead>
+            <tbody id="buses-table"></tbody>
+          </table>
+          <div id="buses-empty" class="admin-empty" style="display:none;">No buses found.</div>
+        </div>
+      </section>
+
+      <section id="members-panel" class="admin-panel">
+        <div class="admin-panel-head">
+          <div><h2>Registered members</h2><p>Member contact information and their confirmed reservation totals.</p></div>
+          <div class="admin-tools"><input class="admin-search" id="member-search" type="search" placeholder="Search members"></div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Member</th><th>Email</th><th>Phone</th><th>Joined</th><th>Bookings</th><th>Seats</th><th>Manage</th></tr></thead>
+            <tbody id="members-table"></tbody>
+          </table>
+          <div id="members-empty" class="admin-empty" style="display:none;">No members found.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="admin-modal" id="bus-modal" role="dialog" aria-modal="true" aria-labelledby="bus-modal-title">
+    <form class="admin-modal-card" id="bus-form">
+      <h2 id="bus-modal-title">Add a bus</h2>
+      <p>Enter route and schedule details. Available seats are calculated from confirmed bookings.</p>
+      <input type="hidden" name="bus_id">
+      <input type="hidden" name="is_active" value="1">
+      <div class="admin-form-grid">
+        <div class="admin-field"><label for="bus-no">Bus number</label><input class="admin-form-control" id="bus-no" name="bus_no" required maxlength="20"></div>
+        <div class="admin-field"><label for="bus-name">Bus name</label><input class="admin-form-control" id="bus-name" name="bus_name" required maxlength="100"></div>
+        <div class="admin-field"><label for="bus-source">From</label><input class="admin-form-control" id="bus-source" name="source" required maxlength="50"></div>
+        <div class="admin-field"><label for="bus-destination">To</label><input class="admin-form-control" id="bus-destination" name="destination" required maxlength="50"></div>
+        <div class="admin-field"><label for="bus-date">Travel date</label><input class="admin-form-control" id="bus-date" name="travel_date" type="date" required></div>
+        <div class="admin-field"><label for="bus-type">Bus type</label><input class="admin-form-control" id="bus-type" name="bus_type" required maxlength="50" placeholder="AC Sleeper (2+1)"></div>
+        <div class="admin-field"><label for="bus-departure">Departure time</label><input class="admin-form-control" id="bus-departure" name="departure_time" type="time" required></div>
+        <div class="admin-field"><label for="bus-arrival">Arrival time</label><input class="admin-form-control" id="bus-arrival" name="arrival_time" type="time" required></div>
+        <div class="admin-field"><label for="bus-duration">Duration</label><input class="admin-form-control" id="bus-duration" name="duration" required maxlength="30" placeholder="6h 30m"></div>
+        <div class="admin-field"><label for="bus-seats">Total seats</label><input class="admin-form-control" id="bus-seats" name="total_seats" type="number" min="1" max="100" required></div>
+        <div class="admin-field"><label for="bus-fare">Fare (₹)</label><input class="admin-form-control" id="bus-fare" name="fare" type="number" min="1" step="0.01" required></div>
+      </div>
+      <div class="admin-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" data-close-modal="bus-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Save bus</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-modal" id="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
+    <form class="admin-modal-card" id="booking-form">
+      <h2 id="booking-modal-title">Edit booking</h2>
+      <p>Changes to booking status automatically update available seats.</p>
+      <input type="hidden" name="booking_id">
+      <div class="admin-form-grid">
+        <div class="admin-field"><label for="booking-passenger-name">Passenger name</label><input class="admin-form-control" id="booking-passenger-name" name="passenger_name" required maxlength="100"></div>
+        <div class="admin-field"><label for="booking-age">Passenger age</label><input class="admin-form-control" id="booking-age" name="passenger_age" type="number" min="1" max="120" required></div>
+        <div class="admin-field"><label for="booking-gender">Passenger gender</label><select class="admin-form-control" id="booking-gender" name="passenger_gender" required><option>Male</option><option>Female</option><option>Other</option></select></div>
+        <div class="admin-field"><label for="booking-seat">Seat number</label><input class="admin-form-control" id="booking-seat" name="seat_no" type="number" min="1" required></div>
+        <div class="admin-field"><label for="booking-fare">Seat fare (₹)</label><input class="admin-form-control" id="booking-fare" name="fare" type="number" min="1" step="0.01" required></div>
+        <div class="admin-field"><label for="booking-status">Booking status</label><select class="admin-form-control" id="booking-status" name="status" required><option value="CONFIRMED">Confirmed</option><option value="CANCELLED">Cancelled</option></select></div>
+      </div>
+      <div class="admin-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" data-close-modal="booking-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Save booking</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-modal" id="member-modal" role="dialog" aria-modal="true" aria-labelledby="member-modal-title">
+    <form class="admin-modal-card" id="member-form">
+      <h2 id="member-modal-title">Edit member</h2>
+      <p>Update this member's account contact details.</p>
+      <input type="hidden" name="passenger_id">
+      <div class="admin-form-grid">
+        <div class="admin-field"><label for="member-name">Full name</label><input class="admin-form-control" id="member-name" name="name" required maxlength="100"></div>
+        <div class="admin-field"><label for="member-email">Email</label><input class="admin-form-control" id="member-email" name="email" type="email" required maxlength="100"></div>
+        <div class="admin-field"><label for="member-phone">Phone</label><input class="admin-form-control" id="member-phone" name="phone" type="tel" required pattern="[0-9]{10}" maxlength="10"></div>
+      </div>
+      <div class="admin-modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" data-close-modal="member-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Save member</button>
+      </div>
+    </form>
+  </div>
+
+  <footer class="footer"><div class="container footer-bottom">&copy; 2026 Sainath Bus Reservation System. All Rights Reserved.</div></footer>
+  <script src="js/api.js"></script>
+  <script>
+    let dashboardData = { stats: {}, bookings: [], members: [], buses: [] };
+
+    function showModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function localDate(value) {
+      if (!value) return '—';
+      const date = new Date(`${String(value).split('T')[0]}T00:00:00`);
+      return Number.isNaN(date.getTime()) ? escapeHtml(value) : date.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    }
+    function localDateTime(value) {
+      if (!value) return '—';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? escapeHtml(value) : date.toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    }
+    function busFormValue(bus, field) {
+      const value = bus[field] == null ? '' : String(bus[field]);
+      const normalized = field === 'departure_time' || field === 'arrival_time' ? value.slice(0, 5) :
+        (field === 'travel_date' ? value.split('T')[0] : value);
+      document.querySelector(`#bus-form [name="${field}"]`).value = normalized;
+    }
+    function drawStats() {
+      const stats = dashboardData.stats;
+      const entries = [
+        ['👥', 'Registered members', stats.total_members],
+        ['🎫', 'Members booked', stats.booked_members],
+        ['💺', 'Confirmed seats', stats.confirmed_seats],
+        ['🚌', 'Buses on sale', stats.total_buses]
+      ];
+      document.getElementById('dashboard-stats').innerHTML = entries.map(([icon, label, value]) => `
+        <article class="admin-stat"><span class="admin-stat-icon">${icon}</span>
+          <div class="admin-stat-label">${label}</div>
+          <div class="admin-stat-value">${Number(value || 0).toLocaleString('en-IN')}</div>
+        </article>`).join('');
+    }
+    function drawBookings() {
+      const query = document.getElementById('booking-search').value.trim().toLowerCase();
+      const status = document.getElementById('booking-status-filter').value;
+      const rows = dashboardData.bookings.filter(b => (status === 'ALL' || b.status === status) &&
+        [b.booking_ref,b.member_name,b.member_email,b.member_phone,b.passenger_name,b.bus_no,b.source,b.destination,b.seat_no]
+          .some(value => String(value || '').toLowerCase().includes(query)));
+      document.getElementById('bookings-table').innerHTML = rows.map(b => `
+        <tr>
+          <td><strong>${escapeHtml(b.booking_ref)}</strong><br><span class="admin-muted">${localDateTime(b.booking_date)}</span><br>
+            <span class="admin-status ${b.status === 'CONFIRMED' ? 'confirmed' : 'cancelled'}">${escapeHtml(b.status)}</span></td>
+          <td><strong>${escapeHtml(b.member_name)}</strong><br>${escapeHtml(b.member_email)}<br><span class="admin-muted">${escapeHtml(b.member_phone)}</span></td>
+          <td>${escapeHtml(b.passenger_name)}<br><span class="admin-muted">${Number(b.passenger_age)} yrs · ${escapeHtml(b.passenger_gender)}</span></td>
+          <td><strong>${escapeHtml(b.bus_no)} · ${escapeHtml(b.bus_name)}</strong><br>${escapeHtml(b.source)} → ${escapeHtml(b.destination)}<br><span class="admin-muted">${escapeHtml(b.bus_type)}</span></td>
+          <td>${localDate(b.travel_date)}<br><span class="admin-muted">${formatTime(String(b.departure_time).slice(0,5))} – ${formatTime(String(b.arrival_time).slice(0,5))}</span></td>
+          <td>${escapeHtml(b.seat_no)}</td><td>${formatINR(b.fare)}</td>
+          <td><button type="button" class="admin-action" data-action="edit-booking" data-id="${Number(b.booking_id)}">Edit</button></td>
+        </tr>`).join('');
+      document.getElementById('bookings-empty').style.display = rows.length ? 'none' : 'block';
+    }
+    function drawBuses() {
+      const query = document.getElementById('bus-search').value.trim().toLowerCase();
+      const rows = dashboardData.buses.filter(b =>
+        [b.bus_no,b.bus_name,b.source,b.destination,b.bus_type].some(value => String(value || '').toLowerCase().includes(query)));
+      document.getElementById('buses-table').innerHTML = rows.map(b => {
+        const active = Number(b.is_active) !== 0;
+        const confirmed = dashboardData.bookings.filter(booking => Number(booking.bus_id) === Number(b.bus_id) && booking.status === 'CONFIRMED').length;
+        return `<tr>
+          <td><strong>${escapeHtml(b.bus_no)}</strong><br>${escapeHtml(b.bus_name)}<br><span class="admin-muted">${escapeHtml(b.bus_type)}</span></td>
+          <td>${escapeHtml(b.source)} → ${escapeHtml(b.destination)}</td><td>${localDate(b.travel_date)}</td>
+          <td>${formatTime(String(b.departure_time).slice(0,5))} – ${formatTime(String(b.arrival_time).slice(0,5))}<br><span class="admin-muted">${escapeHtml(b.duration)}</span></td>
+          <td>${formatINR(b.fare)}</td><td>${Number(b.available_seats)} / ${Number(b.total_seats)} available<br><span class="admin-muted">${confirmed} confirmed</span></td>
+          <td><span class="admin-status ${active ? 'active' : 'inactive'}">${active ? 'On sale' : 'Archived'}</span></td>
+          <td><div class="admin-row-actions"><button type="button" class="admin-action" data-action="edit-bus" data-id="${Number(b.bus_id)}">Edit</button>
+            ${active ? `<button type="button" class="admin-action danger" data-action="remove-bus" data-id="${Number(b.bus_id)}">Remove</button>` :
+              `<button type="button" class="admin-action" data-action="restore-bus" data-id="${Number(b.bus_id)}">Restore</button>`}</div></td>
+        </tr>`;
+      }).join('');
+      document.getElementById('buses-empty').style.display = rows.length ? 'none' : 'block';
+    }
+    function drawMembers() {
+      const query = document.getElementById('member-search').value.trim().toLowerCase();
+      const rows = dashboardData.members.filter(m =>
+        [m.name,m.email,m.phone].some(value => String(value || '').toLowerCase().includes(query)));
+      document.getElementById('members-table').innerHTML = rows.map(m => `
+        <tr><td><strong>${escapeHtml(m.name)}</strong></td><td>${escapeHtml(m.email)}</td>
+          <td>${escapeHtml(m.phone)}</td><td>${localDate(m.created_at)}</td>
+          <td>${Number(m.booking_count || 0)}</td><td>${Number(m.confirmed_seats || 0)}</td>
+          <td><button type="button" class="admin-action" data-action="edit-member" data-id="${Number(m.passenger_id)}">Edit</button></td></tr>`).join('');
+      document.getElementById('members-empty').style.display = rows.length ? 'none' : 'block';
+    }
+    function drawDashboard() { drawStats(); drawBookings(); drawBuses(); drawMembers(); }
+
+    async function loadDashboard() {
+      const errorBox = document.getElementById('dashboard-error');
+      errorBox.style.display = 'none';
+      try {
+        const response = await api.admin.getDashboard();
+        dashboardData = response;
+        drawDashboard();
+        document.getElementById('dashboard-loading').style.display = 'none';
+        document.getElementById('dashboard-content').style.display = 'grid';
+      } catch (error) {
+        errorBox.textContent = error.message || 'Unable to load administrator data.';
+        errorBox.style.display = 'flex';
+      }
+    }
+    function formObject(form) { return Object.fromEntries(new FormData(form).entries()); }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const me = await api.auth.me();
+      if (!me.authenticated) {
+        window.location.href = 'login.html?redirect=admin.html';
+        return;
+      }
+      if (!me.user || me.user.role !== 'ADMIN') {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('dashboard-content').style.display = 'grid';
+      await loadDashboard();
+      window.setInterval(loadDashboard, 30000);
+    });
+
+    document.getElementById('refresh-dashboard').addEventListener('click', loadDashboard);
+    document.querySelectorAll('.admin-tab').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.toggle('active', tab === button));
+      document.querySelectorAll('.admin-panel').forEach(panel => panel.classList.toggle('active', panel.id === button.dataset.panel));
+    }));
+    document.getElementById('booking-search').addEventListener('input', drawBookings);
+    document.getElementById('booking-status-filter').addEventListener('change', drawBookings);
+    document.getElementById('bus-search').addEventListener('input', drawBuses);
+    document.getElementById('member-search').addEventListener('input', drawMembers);
+    document.getElementById('add-bus-button').addEventListener('click', () => {
+      const form = document.getElementById('bus-form');
+      form.reset();
+      form.elements.bus_id.value = '';
+      form.elements.is_active.value = '1';
+      document.getElementById('bus-modal-title').textContent = 'Add a bus';
+      showModal('bus-modal');
+    });
+
+    document.addEventListener('click', async event => {
+      const dismiss = event.target.closest('[data-close-modal]');
+      if (dismiss) { closeModal(dismiss.dataset.closeModal); return; }
+      const modal = event.target.classList.contains('admin-modal') ? event.target : null;
+      if (modal) { closeModal(modal.id); return; }
+      const action = event.target.closest('[data-action]');
+      if (!action) return;
+      const id = Number(action.dataset.id);
+      try {
+        if (action.dataset.action === 'edit-bus') {
+          const bus = dashboardData.buses.find(item => Number(item.bus_id) === id);
+          if (!bus) throw new Error('Bus details are no longer available.');
+          const form = document.getElementById('bus-form');
+          form.reset();
+          form.elements.bus_id.value = bus.bus_id;
+          form.elements.is_active.value = Number(bus.is_active) !== 0 ? '1' : '0';
+          ['bus_no','bus_name','source','destination','departure_time','arrival_time','duration','total_seats','fare','bus_type','travel_date']
+            .forEach(field => busFormValue(bus, field));
+          document.getElementById('bus-modal-title').textContent = 'Edit bus details';
+          showModal('bus-modal');
+        } else if (action.dataset.action === 'edit-booking') {
+          const booking = dashboardData.bookings.find(item => Number(item.booking_id) === id);
+          if (!booking) throw new Error('Booking details are no longer available.');
+          const form = document.getElementById('booking-form');
+          form.elements.booking_id.value = booking.booking_id;
+          ['passenger_name','passenger_age','passenger_gender','seat_no','fare','status']
+            .forEach(field => form.elements[field].value = booking[field]);
+          showModal('booking-modal');
+        } else if (action.dataset.action === 'edit-member') {
+          const member = dashboardData.members.find(item => Number(item.passenger_id) === id);
+          if (!member) throw new Error('Member details are no longer available.');
+          const form = document.getElementById('member-form');
+          ['passenger_id','name','email','phone'].forEach(field =>
+            form.elements[field].value = field === 'passenger_id' ? member.passenger_id : member[field]);
+          showModal('member-modal');
+        } else if (action.dataset.action === 'remove-bus') {
+          if (!window.confirm('Remove this bus from sale? Confirmed bookings must be cancelled first. Booking history will be preserved.')) return;
+          const result = await api.admin.removeBus(id);
+          showToast(result.message, 'success');
+          await loadDashboard();
+        } else if (action.dataset.action === 'restore-bus') {
+          const result = await api.admin.restoreBus(id);
+          showToast(result.message, 'success');
+          await loadDashboard();
+        }
+      } catch (error) { showToast(error.message || 'Could not complete that action.', 'error'); }
+    });
+
+    document.getElementById('bus-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const values = formObject(form);
+      values.total_seats = Number(values.total_seats);
+      values.fare = Number(values.fare);
+      values.is_active = values.is_active === '1';
+      try {
+        const result = values.bus_id
+          ? await api.admin.updateBus(values.bus_id, values)
+          : await api.admin.addBus(values);
+        closeModal('bus-modal');
+        showToast(result.message, 'success');
+        await loadDashboard();
+      } catch (error) { showToast(error.message || 'Could not save bus details.', 'error'); }
+    });
+    document.getElementById('booking-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const values = formObject(event.currentTarget);
+      values.passenger_age = Number(values.passenger_age);
+      values.seat_no = String(values.seat_no);
+      values.fare = Number(values.fare);
+      try {
+        const result = await api.admin.updateBooking(values.booking_id, values);
+        closeModal('booking-modal');
+        showToast(result.message, 'success');
+        await loadDashboard();
+      } catch (error) { showToast(error.message || 'Could not save booking details.', 'error'); }
+    });
+    document.getElementById('member-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const values = formObject(event.currentTarget);
+      try {
+        const result = await api.admin.updateMember(values.passenger_id, values);
+        closeModal('member-modal');
+        showToast(result.message, 'success');
+        await loadDashboard();
+      } catch (error) { showToast(error.message || 'Could not save member details.', 'error'); }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Available buses, schedules, seat counts, and fares on Sainath Bus Reservation across Andhra Pradesh and major destinations.">
+  <title>Available Buses - Sainath Bus Reservation</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .price-range-wrapper {
+      margin-top: 8px;
+    }
+    .price-range-slider {
+      width: 100%;
+      accent-color: var(--accent-orange);
+      cursor: pointer;
+    }
+    .price-range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .bus-amenities-strip {
+      display: flex;
+      gap: 12px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+    .bus-amenity-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-subtle);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" id="header-brand-logo">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path>
+            <circle cx="7" cy="18" r="2"></circle><circle cx="15" cy="18" r="2"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">Sainath <span>Bus</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="buses.html" class="nav-link active">Search Buses</a></li>
+          <li><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-auth-buttons" id="navbar-auth"></div>
+    </div>
+  </header>
+
+  <main class="results-page">
+    <div class="container">
+
+      <!-- Search Summary Bar -->
+      <div class="search-summary-bar">
+        <div class="search-route-info">
+          <div>
+            <div class="search-route-cities">
+              <span id="summary-source">All Cities</span>
+              <span>➔</span>
+              <span id="summary-destination">All Destinations</span>
+            </div>
+            <div class="search-meta">
+              <span id="summary-date">📅 Select Date</span>
+              <span>•</span>
+              <span id="summary-count">Searching buses...</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-toggle-modify" class="btn btn-outline btn-sm">
+          ✏️ Modify Search
+        </button>
+      </div>
+
+      <!-- Modify Search Form Drawer (hidden by default) -->
+      <div id="modify-search-panel" class="card" style="display: none; margin-bottom: 24px; padding: 22px;">
+        <form id="modify-search-form" class="search-form" autocomplete="off">
+          
+          <!-- Origin -->
+          <div class="form-group">
+            <label class="form-label" for="mod-source">From</label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="mod-source" class="form-control" placeholder="Boarding city" required autocomplete="off" style="padding-left: 14px;">
+              <button type="button" id="btn-clear-mod-source" class="btn-clear-input">✕</button>
+              <div id="mod-source-autocomplete-dropdown" class="autocomplete-dropdown"></div>
+            </div>
+          </div>
+
+          <!-- Swap button -->
+          <div style="display: flex; align-items: flex-end;">
+            <button type="button" id="btn-mod-swap" class="swap-btn" title="Swap cities">⇄</button>
+          </div>
+
+          <!-- Destination -->
+          <div class="form-group">
+            <label class="form-label" for="mod-destination">To</label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="mod-destination" class="form-control" placeholder="Destination city" required autocomplete="off" style="padding-left: 14px;">
+              <button type="button" id="btn-clear-mod-dest" class="btn-clear-input">✕</button>
+              <div id="mod-dest-autocomplete-dropdown" class="autocomplete-dropdown"></div>
+            </div>
+          </div>
+
+          <!-- Compact Custom Date Picker -->
+          <div class="form-group">
+            <label class="form-label" for="mod-date-display">Travel Date</label>
+            <div class="custom-date-container">
+              <input type="text" id="mod-date-display" class="form-control" placeholder="Select date" readonly style="cursor: pointer; background: white; padding-left: 14px;">
+              <input type="hidden" id="mod-date" name="travel_date">
+              <div id="mod-calendar-popup" class="custom-calendar-popup"></div>
+            </div>
+          </div>
+
+          <!-- Update Button -->
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Update Results</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Buses Main Layout -->
+      <div class="buses-layout">
+
+        <!-- Filter Sidebar -->
+        <aside class="filter-sidebar">
+          <div class="filter-header">
+            <h3 class="filter-title">Filters</h3>
+            <button type="button" id="btn-clear-filters" class="filter-reset">Reset All</button>
+          </div>
+
+          <!-- Sort By -->
+          <div class="filter-section">
+            <h4 class="filter-section-title">Sort By</h4>
+            <label class="filter-option">
+              <input type="radio" name="sort_order" value="dep_asc" checked>
+              <span>Departure: Earliest first</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="sort_order" value="price_asc">
+              <span>Price: Lowest first</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="sort_order" value="price_desc">
+              <span>Price: Highest first</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="sort_order" value="seats_desc">
+              <span>Seats: High Availability</span>
+            </label>
+          </div>
+
+          <!-- Bus Type Filters -->
+          <div class="filter-section">
+            <h4 class="filter-section-title">Bus Type</h4>
+            <label class="filter-option">
+              <input type="checkbox" class="bus-type-filter" value="AC Sleeper">
+              <span>AC Sleeper</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" class="bus-type-filter" value="Volvo">
+              <span>Volvo Multi-Axle</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" class="bus-type-filter" value="Semi-Sleeper">
+              <span>AC Semi-Sleeper</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" class="bus-type-filter" value="Non-AC">
+              <span>Non-AC Seater</span>
+            </label>
+          </div>
+
+          <!-- Departure Time Filters -->
+          <div class="filter-section">
+            <h4 class="filter-section-title">Departure Time</h4>
+            <label class="filter-option">
+              <input type="checkbox" class="dep-time-filter" value="morning">
+              <span>Morning (06:00 - 12:00)</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" class="dep-time-filter" value="afternoon">
+              <span>Afternoon (12:00 - 18:00)</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" class="dep-time-filter" value="evening">
+              <span>Evening (18:00 - 24:00)</span>
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" class="dep-time-filter" value="night">
+              <span>Night (00:00 - 06:00)</span>
+            </label>
+          </div>
+
+          <!-- Price Range Filter -->
+          <div class="filter-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <h4 class="filter-section-title" style="margin-bottom: 0;">Max Price</h4>
+              <span id="price-range-val" style="font-weight: 700; color: var(--accent-orange); font-size: 0.9rem;">₹2000</span>
+            </div>
+            <div class="price-range-wrapper">
+              <input type="range" id="price-slider" class="price-range-slider" min="150" max="2000" step="50" value="2000">
+              <div class="price-range-labels">
+                <span>₹150</span>
+                <span>₹1000</span>
+                <span>₹2000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seat Availability Toggle -->
+          <div class="filter-section">
+            <label class="filter-option" style="font-weight: 600; color: var(--primary-navy);">
+              <input type="checkbox" id="filter-available-only" checked>
+              <span>Available Seats Only</span>
+            </label>
+          </div>
+        </aside>
+
+        <!-- Bus List Container -->
+        <section id="buses-list-container">
+          <div id="loading-spinner" style="text-align: center; padding: 60px 0;">
+            <div style="font-size: 2.2rem; margin-bottom: 12px; animation: pulse 1s infinite;">🚌</div>
+            <p style="color: var(--text-secondary); font-weight: 500;">Searching available buses on Sainath Network...</p>
+          </div>
+
+          <div id="buses-cards-wrapper"></div>
+
+          <!-- Empty State with Suggested AP Routes -->
+          <div id="no-buses-state" style="display: none; padding: 50px 24px; background: white; border-radius: var(--radius-xl); border: 1.5px dashed var(--border-color); text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 12px;">🗺️</div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.35rem; color: var(--primary-navy); margin-bottom: 6px;">
+              No Direct Buses Found For This Route / Date
+            </h3>
+            <p id="empty-state-message" style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 20px; font-size: 0.92rem; line-height: 1.5;">
+              We couldn't find scheduled buses matching your exact search. Please try adjusting your filters or explore popular connecting routes below:
+            </p>
+
+            <div style="background: var(--bg-subtle); padding: 20px; border-radius: var(--radius-lg); max-width: 600px; margin: 0 auto 24px; text-align: left;">
+              <div style="font-weight: 700; font-size: 0.88rem; color: var(--primary-navy); margin-bottom: 12px;">
+                SUGGESTED POPULAR ANDHRA PRADESH ROUTES:
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button type="button" class="btn btn-secondary btn-sm trigger-empty-route" data-src="Kurnool" data-dst="Hyderabad">
+                  Kurnool ➔ Hyderabad
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm trigger-empty-route" data-src="Kurnool" data-dst="Bengaluru">
+                  Kurnool ➔ Bengaluru
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm trigger-empty-route" data-src="Vijayawada" data-dst="Visakhapatnam">
+                  Vijayawada ➔ Vizag
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm trigger-empty-route" data-src="Kurnool" data-dst="Tirupati">
+                  Kurnool ➔ Tirupati
+                </button>
+              </div>
+            </div>
+
+            <button id="btn-show-all-buses" class="btn btn-primary btn-sm">Show All Available Buses</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      &copy; 2026 Sainath Bus Reservation System. All Rights Reserved.
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/search-components.js"></script>
+  <script>
+    let allFetchedBuses = [];
+
+    function getQueryParams() {
+      const p = new URLSearchParams(window.location.search);
+      return {
+        source: p.get('source') || '',
+        destination: p.get('destination') || '',
+        date: p.get('date') || ''
+      };
+    }
+
+    async function loadBuses(params) {
+      const loader = document.getElementById('loading-spinner');
+      const wrapper = document.getElementById('buses-cards-wrapper');
+      const emptyState = document.getElementById('no-buses-state');
+      
+      loader.style.display = 'block';
+      wrapper.innerHTML = '';
+      emptyState.style.display = 'none';
+
+      // Update Summary Bar
+      const srcDisplay = params.source || 'All Cities';
+      const dstDisplay = params.destination || 'All Destinations';
+      document.getElementById('summary-source').textContent = srcDisplay;
+      document.getElementById('summary-destination').textContent = dstDisplay;
+      document.getElementById('summary-date').textContent = params.date ? `📅 ${formatDate(params.date)}` : '📅 Upcoming Dates';
+
+      // Fill modify inputs
+      document.getElementById('mod-source').value = params.source || '';
+      document.getElementById('mod-destination').value = params.destination || '';
+      document.getElementById('mod-date').value = params.date || '';
+      if (params.date) {
+        const d = new Date(params.date + 'T00:00:00');
+        document.getElementById('mod-date-display').value = d.toLocaleDateString('en-IN', {
+          weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+        });
+      }
+
+      try {
+        const response = await api.buses.search(params);
+        allFetchedBuses = response.buses || [];
+        loader.style.display = 'none';
+        renderFilteredBuses(params);
+      } catch (err) {
+        loader.style.display = 'none';
+        showToast('Error loading buses: ' + err.message, 'error');
+      }
+    }
+
+    function renderFilteredBuses(currentParams = {}) {
+      const wrapper = document.getElementById('buses-cards-wrapper');
+      const emptyState = document.getElementById('no-buses-state');
+      const summaryCount = document.getElementById('summary-count');
+
+      // Selected Bus Types
+      const selectedTypes = Array.from(document.querySelectorAll('.bus-type-filter:checked')).map(cb => cb.value.toLowerCase());
+      
+      // Selected Departure Windows
+      const selectedWindows = Array.from(document.querySelectorAll('.dep-time-filter:checked')).map(cb => cb.value);
+
+      // Selected Sorting
+      const sortOrder = document.querySelector('input[name="sort_order"]:checked')?.value || 'dep_asc';
+
+      // Price slider
+      const maxPrice = parseFloat(document.getElementById('price-slider').value) || 2000;
+
+      // Available only
+      const availableOnly = document.getElementById('filter-available-only').checked;
+
+      let filtered = allFetchedBuses.filter(bus => {
+        // Filter by bus type
+        if (selectedTypes.length > 0) {
+          const typeMatches = selectedTypes.some(t => bus.bus_type.toLowerCase().includes(t));
+          if (!typeMatches) return false;
+        }
+
+        // Filter by departure time
+        if (selectedWindows.length > 0) {
+          const hour = parseInt(bus.departure_time.split(':')[0], 10);
+          const matchesWindow = selectedWindows.some(w => {
+            if (w === 'morning') return hour >= 6 && hour < 12;
+            if (w === 'afternoon') return hour >= 12 && hour < 18;
+            if (w === 'evening') return hour >= 18 && hour < 24;
+            if (w === 'night') return hour >= 0 && hour < 6;
+            return true;
+          });
+          if (!matchesWindow) return false;
+        }
+
+        // Filter by max price
+        if (parseFloat(bus.fare) > maxPrice) return false;
+
+        // Filter by available seats
+        if (availableOnly && bus.available_seats <= 0) return false;
+
+        return true;
+      });
+
+      // Sorting
+      filtered.sort((a, b) => {
+        if (sortOrder === 'price_asc') return parseFloat(a.fare) - parseFloat(b.fare);
+        if (sortOrder === 'price_desc') return parseFloat(b.fare) - parseFloat(a.fare);
+        if (sortOrder === 'seats_desc') return b.available_seats - a.available_seats;
+        return a.departure_time.localeCompare(b.departure_time);
+      });
+
+      // Honest, accurate result count display
+      summaryCount.textContent = `${filtered.length} Bus${filtered.length === 1 ? '' : 'es'} Found`;
+
+      if (filtered.length === 0) {
+        wrapper.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      wrapper.innerHTML = filtered.map(bus => `
+        <div class="bus-card" id="bus-card-${bus.bus_id}">
+          <div class="bus-card-top">
+            <div class="bus-info">
+              <h3 class="bus-name">${escapeHtml(bus.bus_name)}</h3>
+              <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
+                <span class="bus-type-badge">${escapeHtml(bus.bus_type)}</span>
+                <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Bus No: ${escapeHtml(bus.bus_no)}</span>
+                <span style="font-size: 0.82rem; color: var(--text-muted);">• ${formatDate(bus.travel_date)}</span>
+              </div>
+            </div>
+
+            <div class="fare-block">
+              <div class="fare-price">${formatINR(bus.fare)}</div>
+              <div class="fare-label">per passenger seat</div>
+            </div>
+          </div>
+
+          <div class="bus-schedule-row">
+            <div class="schedule-block">
+              <span class="schedule-time">${formatTime(bus.departure_time)}</span>
+              <span class="schedule-city">📍 ${escapeHtml(bus.source)}</span>
+            </div>
+
+            <div class="duration-line">
+              <span class="duration-text">${escapeHtml(bus.duration || '6h')}</span>
+              <div class="duration-bar"></div>
+            </div>
+
+            <div class="schedule-block" style="text-align: right;">
+              <span class="schedule-time">${formatTime(bus.arrival_time)}</span>
+              <span class="schedule-city">🏁 ${escapeHtml(bus.destination)}</span>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <a href="seats.html?bus_id=${bus.bus_id}" class="btn btn-primary" id="btn-select-seats-${bus.bus_id}">
+                Select Seats
+              </a>
+            </div>
+          </div>
+
+          <div class="bus-card-footer">
+            <div class="seats-badge ${bus.available_seats <= 5 ? 'low' : 'available'}">
+              <span>💺</span>
+              <span><strong>${bus.available_seats}</strong> seats available out of ${bus.total_seats}</span>
+            </div>
+
+            <div class="bus-amenities-strip">
+              <span class="bus-amenity-item">⚡ Charging Point</span>
+              <span class="bus-amenity-item">❄️ AC Climate</span>
+              <span class="bus-amenity-item">🛰️ Live Tracking</span>
+              <span class="bus-amenity-item">📱 M-Ticket</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = getQueryParams();
+      loadBuses(params);
+
+      // Setup Autocomplete in Modify Search
+      setupCityAutocomplete('mod-source', 'btn-clear-mod-source', 'mod-source-autocomplete-dropdown', 'mod-destination');
+      setupCityAutocomplete('mod-destination', 'btn-clear-mod-dest', 'mod-dest-autocomplete-dropdown', 'mod-source');
+
+      // Setup Custom Date Picker in Modify Search
+      setupCustomDatePicker('mod-date-display', 'mod-date', 'mod-calendar-popup');
+
+      // Toggle Modify Search Drawer
+      const toggleBtn = document.getElementById('btn-toggle-modify');
+      const modifyPanel = document.getElementById('modify-search-panel');
+      toggleBtn.addEventListener('click', () => {
+        const isHidden = modifyPanel.style.display === 'none';
+        modifyPanel.style.display = isHidden ? 'block' : 'none';
+        toggleBtn.textContent = isHidden ? '✕ Close Panel' : '✏️ Modify Search';
+      });
+
+      // Modify swap button
+      document.getElementById('btn-mod-swap').addEventListener('click', () => {
+        const s = document.getElementById('mod-source');
+        const d = document.getElementById('mod-destination');
+        const temp = s.value;
+        s.value = d.value;
+        d.value = temp;
+      });
+
+      // Modify form submit
+      document.getElementById('modify-search-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const src = document.getElementById('mod-source').value.trim();
+        const dst = document.getElementById('mod-destination').value.trim();
+        const dt = document.getElementById('mod-date').value;
+
+        if (src.toLowerCase() === dst.toLowerCase()) {
+          showToast('Origin and destination cannot be identical', 'error');
+          return;
+        }
+
+        const newUrl = `buses.html?source=${encodeURIComponent(src)}&destination=${encodeURIComponent(dst)}&date=${encodeURIComponent(dt)}`;
+        window.history.pushState({}, '', newUrl);
+        loadBuses({ source: src, destination: dst, date: dt });
+        modifyPanel.style.display = 'none';
+        toggleBtn.textContent = '✏️ Modify Search';
+      });
+
+      // Price slider listener
+      const slider = document.getElementById('price-slider');
+      const priceVal = document.getElementById('price-range-val');
+      slider.addEventListener('input', () => {
+        priceVal.textContent = `₹${slider.value}`;
+        renderFilteredBuses(getQueryParams());
+      });
+
+      // Filter change listeners
+      document.querySelectorAll('.bus-type-filter, .dep-time-filter, input[name="sort_order"], #filter-available-only').forEach(el => {
+        el.addEventListener('change', () => renderFilteredBuses(getQueryParams()));
+      });
+
+      // Reset filters button
+      document.getElementById('btn-clear-filters').addEventListener('click', () => {
+        document.querySelectorAll('.bus-type-filter, .dep-time-filter').forEach(cb => cb.checked = false);
+        document.getElementById('filter-available-only').checked = false;
+        slider.value = 2000;
+        priceVal.textContent = '₹2000';
+        const firstRadio = document.querySelector('input[name="sort_order"][value="dep_asc"]');
+        if (firstRadio) firstRadio.checked = true;
+        renderFilteredBuses(getQueryParams());
+      });
+
+      // Show all buses button
+      document.getElementById('btn-show-all-buses').addEventListener('click', () => {
+        window.history.pushState({}, '', 'buses.html');
+        loadBuses({});
+      });
+
+      // Suggested empty route buttons
+      document.querySelectorAll('.trigger-empty-route').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const s = btn.dataset.src;
+          const d = btn.dataset.dst;
+          window.location.href = `buses.html?source=${encodeURIComponent(s)}&destination=${encodeURIComponent(d)}`;
+        });
+      });
+    });
+  </script>
+</body>
+</html>
